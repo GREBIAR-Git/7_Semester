@@ -1,19 +1,19 @@
-#define F_CPU 1000000UL
 #include <avr/io.h>
-#include <util/delay.h>
-
 
 int main(void)
 {
+	DDRB = 0x00;
+	PORTD = 0b00000000;
+	PORTB = 0b00000001;
 	while (1)
 	{
-		if (PINB & (1<<0))
+		if (PINB & 0b00000001)
 		{
-			PORTD = 0x1;
+			PORTD = 0b00000000;
 		}
 		else
 		{
-			PORTD = 0;
+			PORTD = 0b00000001;
 		}
 	}
 }
