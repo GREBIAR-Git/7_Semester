@@ -146,16 +146,16 @@ Disassembly of section .text:
   dc:	91 cf       	rjmp	.-222    	; 0x0 <__vectors>
 
 000000de <main>:
-  de:	14 b8       	out	0x04, r1	; 4
-  e0:	1b b8       	out	0x0b, r1	; 11
-  e2:	81 e0       	ldi	r24, 0x01	; 1
-  e4:	85 b9       	out	0x05, r24	; 5
-  e6:	28 9b       	sbis	0x05, 0	; 5
+  de:	1a b8       	out	0x0a, r1	; 10
+  e0:	81 e0       	ldi	r24, 0x01	; 1
+  e2:	8b b9       	out	0x0b, r24	; 11
+  e4:	15 b8       	out	0x05, r1	; 5
+  e6:	48 9b       	sbis	0x09, 0	; 9
   e8:	02 c0       	rjmp	.+4      	; 0xee <main+0x10>
-  ea:	1b b8       	out	0x0b, r1	; 11
+  ea:	15 b8       	out	0x05, r1	; 5
   ec:	fc cf       	rjmp	.-8      	; 0xe6 <main+0x8>
   ee:	81 e0       	ldi	r24, 0x01	; 1
-  f0:	8b b9       	out	0x0b, r24	; 11
+  f0:	85 b9       	out	0x05, r24	; 5
   f2:	f9 cf       	rjmp	.-14     	; 0xe6 <main+0x8>
 
 000000f4 <_exit>:
