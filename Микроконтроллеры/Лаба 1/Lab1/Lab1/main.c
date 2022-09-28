@@ -1,10 +1,3 @@
-/*
- * Lab1.c
- *
- * Created: 9/28/2022 5:26:11 PM
- * Author : user
- */ 
-
 #include <avr/io.h>
 #include <util/delay.h>
 
