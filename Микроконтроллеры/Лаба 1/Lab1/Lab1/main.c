@@ -1,19 +1,17 @@
 #include <avr/io.h>
-#include <util/delay.h>
 
 
 int main(void)
 {
-    DDRB=0xFF;
-	while(1)
+	while (1)
 	{
-		if (PORTD == 0b11111110)
+		if (PINB & (1<<0))
 		{
-			PORTB=0b11111110;
+			PORTD = 0x1;
 		}
-		else if (PORTD == 0b11111111)
+		else
 		{
-			PORTB=0b11111111;
+			PORTD = 0;
 		}
 	}
 }
