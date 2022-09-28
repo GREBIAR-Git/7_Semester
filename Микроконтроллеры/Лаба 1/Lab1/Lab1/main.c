@@ -7,10 +7,14 @@ int main(void)
     DDRB=0xFF;
 	while(1)
 	{
-		PORTB=0b11111110;
-		_delay_ms(1000);
-		PORTB=0b11111111;
-		_delay_ms(1000);
+		if (PORTD == 0b11111110)
+		{
+			PORTB=0b11111110;
+		}
+		else if (PORTD == 0b11111111)
+		{
+			PORTB=0b11111111;
+		}
 	}
 }
 
