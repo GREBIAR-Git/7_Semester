@@ -150,7 +150,7 @@ Disassembly of section .text:
   e0:	1b b8       	out	0x0b, r1	; 11
   e2:	81 e0       	ldi	r24, 0x01	; 1
   e4:	85 b9       	out	0x05, r24	; 5
-  e6:	18 9b       	sbis	0x03, 0	; 3
+  e6:	28 9b       	sbis	0x05, 0	; 5
   e8:	02 c0       	rjmp	.+4      	; 0xee <main+0x10>
   ea:	1b b8       	out	0x0b, r1	; 11
   ec:	fc cf       	rjmp	.-8      	; 0xe6 <main+0x8>

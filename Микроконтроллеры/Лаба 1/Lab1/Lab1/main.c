@@ -7,7 +7,7 @@ int main(void)
 	PORTB = 0b00000001;
 	while (1)
 	{
-		if (PINB & 0b00000001)
+		if (PORTB & 0b00000001)
 		{
 			PORTD = 0b00000000;
 		}
