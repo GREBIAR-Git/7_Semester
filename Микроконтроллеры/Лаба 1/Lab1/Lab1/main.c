@@ -2,18 +2,18 @@
 
 int main(void)
 {
-	DDRD = 0x00;
-	PORTD = 0b00000001;
-	PORTB = 0b00000000;
+	DDRD = 0; // 0x
+	PORTD = 1; // 0b
+	PORTB = 0; // 0b
 	while (1)
 	{
-		if (PIND & 0b00000001)
+		if (PIND & 1)
 		{
-			PORTB = 0b00000000;
+			PORTB = 0;
 		}
 		else
 		{
-			PORTB = 0b00000001;
+			PORTB = 1;
 		}
 	}
 }
