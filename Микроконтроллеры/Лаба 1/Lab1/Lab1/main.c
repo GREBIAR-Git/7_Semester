@@ -1,12 +1,15 @@
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <util/delay.h>
 
-void but1(bool* flag,bool* on);
+void but1(bool* flagOnOff,bool* on);
 void nextMode(int* mode);
 void nextStep(int* step);
 void result(int* mode, int* step);
-void onORoff(bool* flag, bool* on);
+void onORoff_Click(bool* flagOnOff, bool* on);
+void but2(bool* flagOnOff, bool* on, int* mode, int* step, bool* flagMode);
+void mode_Click(bool* flagMode, int* mode, int* step);
 
 int main(void)
 {
@@ -15,18 +18,20 @@ int main(void)
 	PORTB = 0; // 0b
 	PORTD = 0b00000111; // 0b
 	bool on=false;
-	bool flag = false;
+	bool flagOnOff = false;
+	bool flagMode = false;
 	int mode = 1;
 	int step = 1;
 	while (1)
 	{
-		but1(&flag,&on);
+		//but1(&flagOnOff,&on);
+		but2(&flagOnOff, &on, &mode, &step, &flagMode);
 	}
 }
 
-void but1(bool* flag, bool* on)
+void but1(bool* flagOnOff, bool* on)
 {
-	onORoff(flag, on);
+	onORoff_Click(flagOnOff, on);
 	
 	if (*on)
 	{
@@ -38,23 +43,55 @@ void but1(bool* flag, bool* on)
 	}
 }
 
-void onORoff(bool* flag, bool* on)
+void but2(bool* flagOnOff, bool* on, int* mode, int* step, bool* flagMode)
+{
+	onORoff_Click(flagOnOff, on);
+	mode_Click(flagMode, mode, step);
+	
+	if (*on)
+	{
+		result(mode, step);
+		_delay_ms(1000);
+		nextStep(step);
+	}
+	else
+	{
+		PORTD = 0;
+	}
+}
+
+void onORoff_Click(bool* flagOnOff, bool* on)
 {
 	if(PINB & 1)
 	{
-		if ((*flag)==false)
+		if ((*flagOnOff)==false)
 		{
-			(*flag) = true;
+			(*flagOnOff) = true;
 			(*on) = !(*on);
 		}
 	}
 	else
 	{
-		(*flag) = false;
+		(*flagOnOff) = false;
 	}
 }
 
 
+void mode_Click(bool* flagMode, int* mode, int* step)
+{
+	if(PINB & 0b00000010)
+	{
+		if ((*flagMode)==false)
+		{
+			(*flagMode) = true;
+			nextMode(mode);
+		}
+	}
+	else
+	{
+		(*flagMode) = false;
+	}
+}
 
 void nextMode(int* mode)
 {
