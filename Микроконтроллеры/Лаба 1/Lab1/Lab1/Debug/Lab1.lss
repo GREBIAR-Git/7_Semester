@@ -3,29 +3,29 @@ Lab1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800200  00800200  000002e4  2**0
+  0 .data         00000000  00800200  00800200  0000034c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000290  00000000  00000000  00000054  2**1
+  1 .text         000002f8  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  000002e4  2**0
+  2 .comment      00000030  00000000  00000000  0000034c  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000314  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  0000037c  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000058  00000000  00000000  00000354  2**0
+  4 .debug_aranges 00000080  00000000  00000000  000003bc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000e28  00000000  00000000  000003ac  2**0
+  5 .debug_info   00001015  00000000  00000000  0000043c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000af5  00000000  00000000  000011d4  2**0
+  6 .debug_abbrev 00000b04  00000000  00000000  00001451  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000004b1  00000000  00000000  00001cc9  2**0
+  7 .debug_line   00000576  00000000  00000000  00001f55  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  000000d8  00000000  00000000  0000217c  2**2
+  8 .debug_frame  00000108  00000000  00000000  000024cc  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000561  00000000  00000000  00002254  2**0
+  9 .debug_str    0000059a  00000000  00000000  000025d4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000042f  00000000  00000000  000027b5  2**0
+ 10 .debug_loc    000005de  00000000  00000000  00002b6e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000048  00000000  00000000  00002be4  2**0
+ 11 .debug_ranges 00000070  00000000  00000000  0000314c  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -141,249 +141,408 @@ Disassembly of section .text:
   d2:	d1 e2       	ldi	r29, 0x21	; 33
   d4:	de bf       	out	0x3e, r29	; 62
   d6:	cd bf       	out	0x3d, r28	; 61
-  d8:	b0 d0       	rcall	.+352    	; 0x23a <main>
-  da:	d8 c0       	rjmp	.+432    	; 0x28c <_exit>
+  d8:	d3 d0       	rcall	.+422    	; 0x280 <main>
+  da:	0c c1       	rjmp	.+536    	; 0x2f4 <_exit>
 
 000000dc <__bad_interrupt>:
   dc:	91 cf       	rjmp	.-222    	; 0x0 <__vectors>
 
-000000de <onORoff_Click>:
-  de:	18 9b       	sbis	0x03, 0	; 3
-  e0:	0b c0       	rjmp	.+22     	; 0xf8 <onORoff_Click+0x1a>
-  e2:	fc 01       	movw	r30, r24
-  e4:	20 81       	ld	r18, Z
-  e6:	21 11       	cpse	r18, r1
-  e8:	09 c0       	rjmp	.+18     	; 0xfc <onORoff_Click+0x1e>
-  ea:	21 e0       	ldi	r18, 0x01	; 1
-  ec:	20 83       	st	Z, r18
-  ee:	fb 01       	movw	r30, r22
-  f0:	80 81       	ld	r24, Z
-  f2:	28 27       	eor	r18, r24
-  f4:	20 83       	st	Z, r18
-  f6:	08 95       	ret
-  f8:	fc 01       	movw	r30, r24
-  fa:	10 82       	st	Z, r1
+000000de <Delay>:
+void nextSpeed(int* speed)
+{
+	(*speed) = (*speed) + 1;
+	if ((*speed) == 4)
+	{
+		(*speed) = 1;
+  de:	fc 01       	movw	r30, r24
+  e0:	80 81       	ld	r24, Z
+  e2:	91 81       	ldd	r25, Z+1	; 0x01
+  e4:	81 30       	cpi	r24, 0x01	; 1
+  e6:	91 05       	cpc	r25, r1
+  e8:	51 f4       	brne	.+20     	; 0xfe <Delay+0x20>
+  ea:	ff e7       	ldi	r31, 0x7F	; 127
+  ec:	28 e3       	ldi	r18, 0x38	; 56
+  ee:	81 e0       	ldi	r24, 0x01	; 1
+  f0:	f1 50       	subi	r31, 0x01	; 1
+  f2:	20 40       	sbci	r18, 0x00	; 0
+  f4:	80 40       	sbci	r24, 0x00	; 0
+  f6:	e1 f7       	brne	.-8      	; 0xf0 <Delay+0x12>
+  f8:	00 c0       	rjmp	.+0      	; 0xfa <Delay+0x1c>
+  fa:	00 00       	nop
   fc:	08 95       	ret
+  fe:	82 30       	cpi	r24, 0x02	; 2
+ 100:	91 05       	cpc	r25, r1
+ 102:	39 f4       	brne	.+14     	; 0x112 <Delay+0x34>
+ 104:	ef e4       	ldi	r30, 0x4F	; 79
+ 106:	f3 ec       	ldi	r31, 0xC3	; 195
+ 108:	31 97       	sbiw	r30, 0x01	; 1
+ 10a:	f1 f7       	brne	.-4      	; 0x108 <Delay+0x2a>
+ 10c:	00 c0       	rjmp	.+0      	; 0x10e <Delay+0x30>
+ 10e:	00 00       	nop
+ 110:	08 95       	ret
+ 112:	03 97       	sbiw	r24, 0x03	; 3
+ 114:	31 f4       	brne	.+12     	; 0x122 <Delay+0x44>
+ 116:	87 ea       	ldi	r24, 0xA7	; 167
+ 118:	91 e6       	ldi	r25, 0x61	; 97
+ 11a:	01 97       	sbiw	r24, 0x01	; 1
+ 11c:	f1 f7       	brne	.-4      	; 0x11a <Delay+0x3c>
+ 11e:	00 c0       	rjmp	.+0      	; 0x120 <Delay+0x42>
+ 120:	00 00       	nop
+ 122:	08 95       	ret
 
-000000fe <nextMode>:
-  fe:	fc 01       	movw	r30, r24
- 100:	20 81       	ld	r18, Z
- 102:	31 81       	ldd	r19, Z+1	; 0x01
- 104:	2f 5f       	subi	r18, 0xFF	; 255
- 106:	3f 4f       	sbci	r19, 0xFF	; 255
- 108:	31 83       	std	Z+1, r19	; 0x01
- 10a:	20 83       	st	Z, r18
- 10c:	24 30       	cpi	r18, 0x04	; 4
- 10e:	31 05       	cpc	r19, r1
- 110:	21 f4       	brne	.+8      	; 0x11a <nextMode+0x1c>
- 112:	81 e0       	ldi	r24, 0x01	; 1
- 114:	90 e0       	ldi	r25, 0x00	; 0
- 116:	91 83       	std	Z+1, r25	; 0x01
- 118:	80 83       	st	Z, r24
- 11a:	08 95       	ret
+00000124 <onORoff_Click>:
+ 124:	18 9b       	sbis	0x03, 0	; 3
+ 126:	0b c0       	rjmp	.+22     	; 0x13e <onORoff_Click+0x1a>
+ 128:	fc 01       	movw	r30, r24
+ 12a:	20 81       	ld	r18, Z
+ 12c:	21 11       	cpse	r18, r1
+ 12e:	09 c0       	rjmp	.+18     	; 0x142 <onORoff_Click+0x1e>
+ 130:	21 e0       	ldi	r18, 0x01	; 1
+ 132:	20 83       	st	Z, r18
+ 134:	fb 01       	movw	r30, r22
+ 136:	80 81       	ld	r24, Z
+ 138:	28 27       	eor	r18, r24
+ 13a:	20 83       	st	Z, r18
+ 13c:	08 95       	ret
+ 13e:	fc 01       	movw	r30, r24
+ 140:	10 82       	st	Z, r1
+ 142:	08 95       	ret
 
-0000011c <mode_Click>:
- 11c:	19 9b       	sbis	0x03, 1	; 3
- 11e:	09 c0       	rjmp	.+18     	; 0x132 <mode_Click+0x16>
- 120:	fc 01       	movw	r30, r24
- 122:	20 81       	ld	r18, Z
- 124:	21 11       	cpse	r18, r1
- 126:	07 c0       	rjmp	.+14     	; 0x136 <mode_Click+0x1a>
- 128:	81 e0       	ldi	r24, 0x01	; 1
- 12a:	80 83       	st	Z, r24
- 12c:	cb 01       	movw	r24, r22
- 12e:	e7 cf       	rjmp	.-50     	; 0xfe <nextMode>
- 130:	08 95       	ret
- 132:	fc 01       	movw	r30, r24
- 134:	10 82       	st	Z, r1
- 136:	08 95       	ret
+00000144 <but1>:
+ 144:	ef cf       	rjmp	.-34     	; 0x124 <onORoff_Click>
+ 146:	08 95       	ret
 
-00000138 <nextStep>:
- 138:	fc 01       	movw	r30, r24
- 13a:	20 81       	ld	r18, Z
- 13c:	31 81       	ldd	r19, Z+1	; 0x01
- 13e:	2f 5f       	subi	r18, 0xFF	; 255
- 140:	3f 4f       	sbci	r19, 0xFF	; 255
- 142:	31 83       	std	Z+1, r19	; 0x01
- 144:	20 83       	st	Z, r18
- 146:	24 30       	cpi	r18, 0x04	; 4
- 148:	31 05       	cpc	r19, r1
- 14a:	21 f4       	brne	.+8      	; 0x154 <nextStep+0x1c>
- 14c:	81 e0       	ldi	r24, 0x01	; 1
- 14e:	90 e0       	ldi	r25, 0x00	; 0
- 150:	91 83       	std	Z+1, r25	; 0x01
- 152:	80 83       	st	Z, r24
- 154:	08 95       	ret
+00000148 <nextMode>:
+ 148:	fc 01       	movw	r30, r24
+ 14a:	20 81       	ld	r18, Z
+ 14c:	31 81       	ldd	r19, Z+1	; 0x01
+ 14e:	2f 5f       	subi	r18, 0xFF	; 255
+ 150:	3f 4f       	sbci	r19, 0xFF	; 255
+ 152:	31 83       	std	Z+1, r19	; 0x01
+ 154:	20 83       	st	Z, r18
+ 156:	24 30       	cpi	r18, 0x04	; 4
+ 158:	31 05       	cpc	r19, r1
+ 15a:	21 f4       	brne	.+8      	; 0x164 <nextMode+0x1c>
+ 15c:	81 e0       	ldi	r24, 0x01	; 1
+ 15e:	90 e0       	ldi	r25, 0x00	; 0
+ 160:	91 83       	std	Z+1, r25	; 0x01
+ 162:	80 83       	st	Z, r24
+ 164:	08 95       	ret
 
-00000156 <result>:
- 156:	fc 01       	movw	r30, r24
- 158:	80 81       	ld	r24, Z
- 15a:	91 81       	ldd	r25, Z+1	; 0x01
- 15c:	81 30       	cpi	r24, 0x01	; 1
- 15e:	91 05       	cpc	r25, r1
- 160:	a1 f4       	brne	.+40     	; 0x18a <result+0x34>
- 162:	fb 01       	movw	r30, r22
- 164:	80 81       	ld	r24, Z
- 166:	91 81       	ldd	r25, Z+1	; 0x01
- 168:	81 30       	cpi	r24, 0x01	; 1
- 16a:	91 05       	cpc	r25, r1
- 16c:	19 f4       	brne	.+6      	; 0x174 <result+0x1e>
- 16e:	81 e0       	ldi	r24, 0x01	; 1
- 170:	8b b9       	out	0x0b, r24	; 11
- 172:	08 95       	ret
- 174:	82 30       	cpi	r24, 0x02	; 2
- 176:	91 05       	cpc	r25, r1
- 178:	19 f4       	brne	.+6      	; 0x180 <result+0x2a>
- 17a:	82 e0       	ldi	r24, 0x02	; 2
- 17c:	8b b9       	out	0x0b, r24	; 11
- 17e:	08 95       	ret
- 180:	03 97       	sbiw	r24, 0x03	; 3
- 182:	71 f5       	brne	.+92     	; 0x1e0 <result+0x8a>
- 184:	84 e0       	ldi	r24, 0x04	; 4
- 186:	8b b9       	out	0x0b, r24	; 11
- 188:	08 95       	ret
- 18a:	82 30       	cpi	r24, 0x02	; 2
- 18c:	91 05       	cpc	r25, r1
- 18e:	99 f4       	brne	.+38     	; 0x1b6 <result+0x60>
- 190:	fb 01       	movw	r30, r22
- 192:	80 81       	ld	r24, Z
- 194:	91 81       	ldd	r25, Z+1	; 0x01
- 196:	81 30       	cpi	r24, 0x01	; 1
- 198:	91 05       	cpc	r25, r1
- 19a:	19 f4       	brne	.+6      	; 0x1a2 <result+0x4c>
- 19c:	87 e0       	ldi	r24, 0x07	; 7
- 19e:	8b b9       	out	0x0b, r24	; 11
+00000166 <mode_Click>:
+ 166:	19 9b       	sbis	0x03, 1	; 3
+ 168:	09 c0       	rjmp	.+18     	; 0x17c <mode_Click+0x16>
+ 16a:	fc 01       	movw	r30, r24
+ 16c:	20 81       	ld	r18, Z
+ 16e:	21 11       	cpse	r18, r1
+ 170:	07 c0       	rjmp	.+14     	; 0x180 <mode_Click+0x1a>
+ 172:	81 e0       	ldi	r24, 0x01	; 1
+ 174:	80 83       	st	Z, r24
+ 176:	cb 01       	movw	r24, r22
+ 178:	e7 cf       	rjmp	.-50     	; 0x148 <nextMode>
+ 17a:	08 95       	ret
+ 17c:	fc 01       	movw	r30, r24
+ 17e:	10 82       	st	Z, r1
+ 180:	08 95       	ret
+
+00000182 <but2>:
+ 182:	f1 cf       	rjmp	.-30     	; 0x166 <mode_Click>
+ 184:	08 95       	ret
+
+00000186 <speed_Click>:
+ 186:	1a 9b       	sbis	0x03, 2	; 3
+ 188:	09 c0       	rjmp	.+18     	; 0x19c <speed_Click+0x16>
+ 18a:	fc 01       	movw	r30, r24
+ 18c:	20 81       	ld	r18, Z
+ 18e:	21 11       	cpse	r18, r1
+ 190:	07 c0       	rjmp	.+14     	; 0x1a0 <speed_Click+0x1a>
+ 192:	81 e0       	ldi	r24, 0x01	; 1
+ 194:	80 83       	st	Z, r24
+ 196:	cb 01       	movw	r24, r22
+ 198:	d7 cf       	rjmp	.-82     	; 0x148 <nextMode>
+ 19a:	08 95       	ret
+ 19c:	fc 01       	movw	r30, r24
+ 19e:	10 82       	st	Z, r1
  1a0:	08 95       	ret
- 1a2:	82 30       	cpi	r24, 0x02	; 2
- 1a4:	91 05       	cpc	r25, r1
- 1a6:	11 f4       	brne	.+4      	; 0x1ac <result+0x56>
- 1a8:	1b b8       	out	0x0b, r1	; 11
- 1aa:	08 95       	ret
- 1ac:	03 97       	sbiw	r24, 0x03	; 3
- 1ae:	c1 f4       	brne	.+48     	; 0x1e0 <result+0x8a>
- 1b0:	82 e0       	ldi	r24, 0x02	; 2
- 1b2:	8b b9       	out	0x0b, r24	; 11
- 1b4:	08 95       	ret
- 1b6:	03 97       	sbiw	r24, 0x03	; 3
- 1b8:	99 f4       	brne	.+38     	; 0x1e0 <result+0x8a>
- 1ba:	fb 01       	movw	r30, r22
- 1bc:	80 81       	ld	r24, Z
- 1be:	91 81       	ldd	r25, Z+1	; 0x01
- 1c0:	81 30       	cpi	r24, 0x01	; 1
- 1c2:	91 05       	cpc	r25, r1
- 1c4:	19 f4       	brne	.+6      	; 0x1cc <result+0x76>
- 1c6:	87 e0       	ldi	r24, 0x07	; 7
- 1c8:	8b b9       	out	0x0b, r24	; 11
- 1ca:	08 95       	ret
- 1cc:	82 30       	cpi	r24, 0x02	; 2
- 1ce:	91 05       	cpc	r25, r1
- 1d0:	19 f4       	brne	.+6      	; 0x1d8 <result+0x82>
- 1d2:	87 e0       	ldi	r24, 0x07	; 7
- 1d4:	8b b9       	out	0x0b, r24	; 11
- 1d6:	08 95       	ret
- 1d8:	03 97       	sbiw	r24, 0x03	; 3
- 1da:	11 f4       	brne	.+4      	; 0x1e0 <result+0x8a>
- 1dc:	87 e0       	ldi	r24, 0x07	; 7
+
+000001a2 <but3>:
+ 1a2:	f1 cf       	rjmp	.-30     	; 0x186 <speed_Click>
+ 1a4:	08 95       	ret
+
+000001a6 <nextStep>:
+	}
+}
+
+void nextStep(int* step)
+{
+ 1a6:	fc 01       	movw	r30, r24
+	(*step) = (*step) + 1;
+ 1a8:	20 81       	ld	r18, Z
+ 1aa:	31 81       	ldd	r19, Z+1	; 0x01
+ 1ac:	2f 5f       	subi	r18, 0xFF	; 255
+ 1ae:	3f 4f       	sbci	r19, 0xFF	; 255
+ 1b0:	31 83       	std	Z+1, r19	; 0x01
+ 1b2:	20 83       	st	Z, r18
+	if ((*step) == 4)
+ 1b4:	24 30       	cpi	r18, 0x04	; 4
+ 1b6:	31 05       	cpc	r19, r1
+ 1b8:	21 f4       	brne	.+8      	; 0x1c2 <nextStep+0x1c>
+	{
+		(*step) = 1;
+ 1ba:	81 e0       	ldi	r24, 0x01	; 1
+ 1bc:	90 e0       	ldi	r25, 0x00	; 0
+ 1be:	91 83       	std	Z+1, r25	; 0x01
+ 1c0:	80 83       	st	Z, r24
+ 1c2:	08 95       	ret
+
+000001c4 <result>:
+	}
+}
+
+void result(int* mode, int* step)
+{
+	if ((*mode) == 1)
+ 1c4:	fc 01       	movw	r30, r24
+ 1c6:	80 81       	ld	r24, Z
+ 1c8:	91 81       	ldd	r25, Z+1	; 0x01
+ 1ca:	81 30       	cpi	r24, 0x01	; 1
+ 1cc:	91 05       	cpc	r25, r1
+ 1ce:	a1 f4       	brne	.+40     	; 0x1f8 <result+0x34>
+	{
+		if ((*step) == 1)
+ 1d0:	fb 01       	movw	r30, r22
+ 1d2:	80 81       	ld	r24, Z
+ 1d4:	91 81       	ldd	r25, Z+1	; 0x01
+ 1d6:	81 30       	cpi	r24, 0x01	; 1
+ 1d8:	91 05       	cpc	r25, r1
+ 1da:	19 f4       	brne	.+6      	; 0x1e2 <result+0x1e>
+		{
+			PORTD = 0b00000001;
+ 1dc:	81 e0       	ldi	r24, 0x01	; 1
  1de:	8b b9       	out	0x0b, r24	; 11
  1e0:	08 95       	ret
-
-000001e2 <but2>:
- 1e2:	cf 92       	push	r12
- 1e4:	df 92       	push	r13
- 1e6:	ef 92       	push	r14
- 1e8:	ff 92       	push	r15
- 1ea:	0f 93       	push	r16
- 1ec:	1f 93       	push	r17
- 1ee:	cf 93       	push	r28
- 1f0:	df 93       	push	r29
- 1f2:	eb 01       	movw	r28, r22
- 1f4:	6a 01       	movw	r12, r20
- 1f6:	79 01       	movw	r14, r18
- 1f8:	72 df       	rcall	.-284    	; 0xde <onORoff_Click>
- 1fa:	a7 01       	movw	r20, r14
- 1fc:	b6 01       	movw	r22, r12
- 1fe:	c8 01       	movw	r24, r16
- 200:	8d df       	rcall	.-230    	; 0x11c <mode_Click>
- 202:	88 81       	ld	r24, Y
- 204:	88 23       	and	r24, r24
- 206:	79 f0       	breq	.+30     	; 0x226 <but2+0x44>
- 208:	b7 01       	movw	r22, r14
- 20a:	c6 01       	movw	r24, r12
- 20c:	a4 df       	rcall	.-184    	; 0x156 <result>
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
-
-	__builtin_avr_delay_cycles(__ticks_dc);
- 20e:	2f e3       	ldi	r18, 0x3F	; 63
- 210:	8d e0       	ldi	r24, 0x0D	; 13
- 212:	93 e0       	ldi	r25, 0x03	; 3
- 214:	21 50       	subi	r18, 0x01	; 1
- 216:	80 40       	sbci	r24, 0x00	; 0
- 218:	90 40       	sbci	r25, 0x00	; 0
- 21a:	e1 f7       	brne	.-8      	; 0x214 <but2+0x32>
- 21c:	00 c0       	rjmp	.+0      	; 0x21e <but2+0x3c>
- 21e:	00 00       	nop
- 220:	c7 01       	movw	r24, r14
- 222:	8a df       	rcall	.-236    	; 0x138 <nextStep>
- 224:	01 c0       	rjmp	.+2      	; 0x228 <but2+0x46>
- 226:	1b b8       	out	0x0b, r1	; 11
- 228:	df 91       	pop	r29
- 22a:	cf 91       	pop	r28
- 22c:	1f 91       	pop	r17
- 22e:	0f 91       	pop	r16
- 230:	ff 90       	pop	r15
- 232:	ef 90       	pop	r14
- 234:	df 90       	pop	r13
- 236:	cf 90       	pop	r12
+		}
+		else if ((*step) == 2)
+ 1e2:	82 30       	cpi	r24, 0x02	; 2
+ 1e4:	91 05       	cpc	r25, r1
+ 1e6:	19 f4       	brne	.+6      	; 0x1ee <result+0x2a>
+		{
+			PORTD = 0b00000010;
+ 1e8:	82 e0       	ldi	r24, 0x02	; 2
+ 1ea:	8b b9       	out	0x0b, r24	; 11
+ 1ec:	08 95       	ret
+		}
+		else if ((*step) == 3)
+ 1ee:	03 97       	sbiw	r24, 0x03	; 3
+ 1f0:	71 f5       	brne	.+92     	; 0x24e <result+0x8a>
+		{
+			PORTD = 0b00000100;
+ 1f2:	84 e0       	ldi	r24, 0x04	; 4
+ 1f4:	8b b9       	out	0x0b, r24	; 11
+ 1f6:	08 95       	ret
+		}
+	}
+	else if ((*mode) == 2)
+ 1f8:	82 30       	cpi	r24, 0x02	; 2
+ 1fa:	91 05       	cpc	r25, r1
+ 1fc:	99 f4       	brne	.+38     	; 0x224 <result+0x60>
+	{
+		if ((*step) == 1)
+ 1fe:	fb 01       	movw	r30, r22
+ 200:	80 81       	ld	r24, Z
+ 202:	91 81       	ldd	r25, Z+1	; 0x01
+ 204:	81 30       	cpi	r24, 0x01	; 1
+ 206:	91 05       	cpc	r25, r1
+ 208:	19 f4       	brne	.+6      	; 0x210 <result+0x4c>
+		{
+			PORTD = 0b00000111;
+ 20a:	87 e0       	ldi	r24, 0x07	; 7
+ 20c:	8b b9       	out	0x0b, r24	; 11
+ 20e:	08 95       	ret
+		}
+		else if ((*step) == 2)
+ 210:	82 30       	cpi	r24, 0x02	; 2
+ 212:	91 05       	cpc	r25, r1
+ 214:	11 f4       	brne	.+4      	; 0x21a <result+0x56>
+		{
+			PORTD = 0b00000000;
+ 216:	1b b8       	out	0x0b, r1	; 11
+ 218:	08 95       	ret
+		}
+		else if ((*step) == 3)
+ 21a:	03 97       	sbiw	r24, 0x03	; 3
+ 21c:	c1 f4       	brne	.+48     	; 0x24e <result+0x8a>
+		{
+			PORTD = 0b00000010;
+ 21e:	82 e0       	ldi	r24, 0x02	; 2
+ 220:	8b b9       	out	0x0b, r24	; 11
+ 222:	08 95       	ret
+		}
+	}
+	else if ((*mode) == 3)
+ 224:	03 97       	sbiw	r24, 0x03	; 3
+ 226:	99 f4       	brne	.+38     	; 0x24e <result+0x8a>
+	{
+		if ((*step) == 1)
+ 228:	fb 01       	movw	r30, r22
+ 22a:	80 81       	ld	r24, Z
+ 22c:	91 81       	ldd	r25, Z+1	; 0x01
+ 22e:	81 30       	cpi	r24, 0x01	; 1
+ 230:	91 05       	cpc	r25, r1
+ 232:	19 f4       	brne	.+6      	; 0x23a <result+0x76>
+		{
+			PORTD = 0b00000111;
+ 234:	87 e0       	ldi	r24, 0x07	; 7
+ 236:	8b b9       	out	0x0b, r24	; 11
  238:	08 95       	ret
+		}
+		else if ((*step) == 2)
+ 23a:	82 30       	cpi	r24, 0x02	; 2
+ 23c:	91 05       	cpc	r25, r1
+ 23e:	19 f4       	brne	.+6      	; 0x246 <result+0x82>
+		{
+			PORTD = 0b00000111;
+ 240:	87 e0       	ldi	r24, 0x07	; 7
+ 242:	8b b9       	out	0x0b, r24	; 11
+ 244:	08 95       	ret
+		}
+		else if ((*step) == 3)
+ 246:	03 97       	sbiw	r24, 0x03	; 3
+ 248:	11 f4       	brne	.+4      	; 0x24e <result+0x8a>
+		{
+			PORTD = 0b00000111;
+ 24a:	87 e0       	ldi	r24, 0x07	; 7
+ 24c:	8b b9       	out	0x0b, r24	; 11
+ 24e:	08 95       	ret
 
-0000023a <main>:
- 23a:	cf 93       	push	r28
- 23c:	df 93       	push	r29
- 23e:	cd b7       	in	r28, 0x3d	; 61
- 240:	de b7       	in	r29, 0x3e	; 62
- 242:	27 97       	sbiw	r28, 0x07	; 7
- 244:	0f b6       	in	r0, 0x3f	; 63
- 246:	f8 94       	cli
- 248:	de bf       	out	0x3e, r29	; 62
- 24a:	0f be       	out	0x3f, r0	; 63
- 24c:	cd bf       	out	0x3d, r28	; 61
- 24e:	81 e0       	ldi	r24, 0x01	; 1
- 250:	8a b9       	out	0x0a, r24	; 10
- 252:	14 b8       	out	0x04, r1	; 4
- 254:	15 b8       	out	0x05, r1	; 5
- 256:	87 e0       	ldi	r24, 0x07	; 7
- 258:	8b b9       	out	0x0b, r24	; 11
- 25a:	19 82       	std	Y+1, r1	; 0x01
- 25c:	1a 82       	std	Y+2, r1	; 0x02
- 25e:	1b 82       	std	Y+3, r1	; 0x03
- 260:	81 e0       	ldi	r24, 0x01	; 1
- 262:	90 e0       	ldi	r25, 0x00	; 0
- 264:	9d 83       	std	Y+5, r25	; 0x05
- 266:	8c 83       	std	Y+4, r24	; 0x04
- 268:	9f 83       	std	Y+7, r25	; 0x07
- 26a:	8e 83       	std	Y+6, r24	; 0x06
- 26c:	8e 01       	movw	r16, r28
- 26e:	0d 5f       	subi	r16, 0xFD	; 253
- 270:	1f 4f       	sbci	r17, 0xFF	; 255
- 272:	9e 01       	movw	r18, r28
- 274:	2a 5f       	subi	r18, 0xFA	; 250
- 276:	3f 4f       	sbci	r19, 0xFF	; 255
- 278:	ae 01       	movw	r20, r28
- 27a:	4c 5f       	subi	r20, 0xFC	; 252
- 27c:	5f 4f       	sbci	r21, 0xFF	; 255
- 27e:	be 01       	movw	r22, r28
- 280:	6f 5f       	subi	r22, 0xFF	; 255
- 282:	7f 4f       	sbci	r23, 0xFF	; 255
- 284:	ce 01       	movw	r24, r28
- 286:	02 96       	adiw	r24, 0x02	; 2
- 288:	ac df       	rcall	.-168    	; 0x1e2 <but2>
- 28a:	f0 cf       	rjmp	.-32     	; 0x26c <main+0x32>
+00000250 <light>:
+		light(&on, &mode, &step, &speed);
+	}
+}
 
-0000028c <_exit>:
+void light(bool* on, int* mode, int* step, int* speed)
+{
+ 250:	0f 93       	push	r16
+ 252:	1f 93       	push	r17
+ 254:	cf 93       	push	r28
+ 256:	df 93       	push	r29
+	if (*on)
+ 258:	fc 01       	movw	r30, r24
+ 25a:	90 81       	ld	r25, Z
+ 25c:	99 23       	and	r25, r25
+ 25e:	51 f0       	breq	.+20     	; 0x274 <light+0x24>
+ 260:	89 01       	movw	r16, r18
+ 262:	ea 01       	movw	r28, r20
+ 264:	cb 01       	movw	r24, r22
+	{
+		result(mode, step);
+ 266:	ba 01       	movw	r22, r20
+ 268:	ad df       	rcall	.-166    	; 0x1c4 <result>
+		Delay(speed);
+ 26a:	c8 01       	movw	r24, r16
+ 26c:	38 df       	rcall	.-400    	; 0xde <Delay>
+		nextStep(step);
+ 26e:	ce 01       	movw	r24, r28
+ 270:	9a df       	rcall	.-204    	; 0x1a6 <nextStep>
+ 272:	01 c0       	rjmp	.+2      	; 0x276 <light+0x26>
+ 274:	1b b8       	out	0x0b, r1	; 11
+	}
+	else
+	{
+		PORTD = 0;
+ 276:	df 91       	pop	r29
+	}
+}
+ 278:	cf 91       	pop	r28
+ 27a:	1f 91       	pop	r17
+ 27c:	0f 91       	pop	r16
+ 27e:	08 95       	ret
+
+00000280 <main>:
+ 280:	cf 93       	push	r28
+void nextSpeed(int* speed);
+void speed_Click(bool* flagSpeed, int* speed);
+void Delay(int* speed);
+
+int main(void)
+{
+ 282:	df 93       	push	r29
+ 284:	cd b7       	in	r28, 0x3d	; 61
+ 286:	de b7       	in	r29, 0x3e	; 62
+ 288:	2a 97       	sbiw	r28, 0x0a	; 10
+ 28a:	0f b6       	in	r0, 0x3f	; 63
  28c:	f8 94       	cli
+ 28e:	de bf       	out	0x3e, r29	; 62
+ 290:	0f be       	out	0x3f, r0	; 63
+ 292:	cd bf       	out	0x3d, r28	; 61
+	DDRD = 0b00000111; // 0x
+ 294:	87 e0       	ldi	r24, 0x07	; 7
+ 296:	8a b9       	out	0x0a, r24	; 10
+	DDRB = 0; // 0x
+ 298:	14 b8       	out	0x04, r1	; 4
+	PORTB = 0; // 0b
+ 29a:	15 b8       	out	0x05, r1	; 5
+	PORTD = 0b00000111; // 0b
+ 29c:	8b b9       	out	0x0b, r24	; 11
+	bool on=false;
+ 29e:	19 82       	std	Y+1, r1	; 0x01
+	bool flagOnOff = false;
+ 2a0:	1a 82       	std	Y+2, r1	; 0x02
+	bool flagMode = false;
+ 2a2:	1b 82       	std	Y+3, r1	; 0x03
+	bool flagSpeed = false; 
+ 2a4:	1c 82       	std	Y+4, r1	; 0x04
+	int mode = 1;
+ 2a6:	81 e0       	ldi	r24, 0x01	; 1
+ 2a8:	90 e0       	ldi	r25, 0x00	; 0
+ 2aa:	9e 83       	std	Y+6, r25	; 0x06
+ 2ac:	8d 83       	std	Y+5, r24	; 0x05
+	int step = 1;
+ 2ae:	98 87       	std	Y+8, r25	; 0x08
+ 2b0:	8f 83       	std	Y+7, r24	; 0x07
+	int speed = 1;
+ 2b2:	9a 87       	std	Y+10, r25	; 0x0a
+ 2b4:	89 87       	std	Y+9, r24	; 0x09
+	while (1)
+	{
+		but1(&flagOnOff,&on);
+ 2b6:	be 01       	movw	r22, r28
+ 2b8:	6f 5f       	subi	r22, 0xFF	; 255
+ 2ba:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2bc:	ce 01       	movw	r24, r28
+ 2be:	02 96       	adiw	r24, 0x02	; 2
+ 2c0:	41 df       	rcall	.-382    	; 0x144 <but1>
+		but2(&flagMode, &mode);
+ 2c2:	be 01       	movw	r22, r28
+ 2c4:	6b 5f       	subi	r22, 0xFB	; 251
+ 2c6:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2c8:	ce 01       	movw	r24, r28
+ 2ca:	03 96       	adiw	r24, 0x03	; 3
+ 2cc:	5a df       	rcall	.-332    	; 0x182 <but2>
+		but3(&flagSpeed,&speed);
+ 2ce:	be 01       	movw	r22, r28
+ 2d0:	67 5f       	subi	r22, 0xF7	; 247
+ 2d2:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2d4:	ce 01       	movw	r24, r28
+ 2d6:	04 96       	adiw	r24, 0x04	; 4
+ 2d8:	64 df       	rcall	.-312    	; 0x1a2 <but3>
+		light(&on, &mode, &step, &speed);
+ 2da:	9e 01       	movw	r18, r28
+ 2dc:	27 5f       	subi	r18, 0xF7	; 247
+ 2de:	3f 4f       	sbci	r19, 0xFF	; 255
+ 2e0:	ae 01       	movw	r20, r28
+ 2e2:	49 5f       	subi	r20, 0xF9	; 249
+ 2e4:	5f 4f       	sbci	r21, 0xFF	; 255
+ 2e6:	be 01       	movw	r22, r28
+ 2e8:	6b 5f       	subi	r22, 0xFB	; 251
+ 2ea:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2ec:	ce 01       	movw	r24, r28
+ 2ee:	01 96       	adiw	r24, 0x01	; 1
+ 2f0:	af df       	rcall	.-162    	; 0x250 <light>
+ 2f2:	e1 cf       	rjmp	.-62     	; 0x2b6 <main+0x36>
 
-0000028e <__stop_program>:
- 28e:	ff cf       	rjmp	.-2      	; 0x28e <__stop_program>
+000002f4 <_exit>:
+ 2f4:	f8 94       	cli
+
+000002f6 <__stop_program>:
+ 2f6:	ff cf       	rjmp	.-2      	; 0x2f6 <__stop_program>

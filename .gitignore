@@ -1,2 +1,5 @@
 Git (Лукьянов)/92PG/temp/*
 Git (Лукьянов)/92PG/log/*.tmp
+*.vs/
+*.vscode/
+*vs/

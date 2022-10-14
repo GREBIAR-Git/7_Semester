@@ -8,56 +8,79 @@ void nextMode(int* mode);
 void nextStep(int* step);
 void result(int* mode, int* step);
 void onORoff_Click(bool* flagOnOff, bool* on);
-void but2(bool* flagOnOff, bool* on, int* mode, int* step, bool* flagMode);
-void mode_Click(bool* flagMode, int* mode, int* step);
+void but2(bool* flagMode, int* mode);
+void mode_Click(bool* flagMode, int* mode);
+void light(bool* on, int* mode, int* step, int* speed);
+void but3(bool* flagSpeed, int* speed);
+void nextSpeed(int* speed);
+void speed_Click(bool* flagSpeed, int* speed);
+void Delay(int* speed);
 
 int main(void)
 {
-	DDRD = 1; // 0x
+	DDRD = 0b00000111; // 0x
 	DDRB = 0; // 0x
 	PORTB = 0; // 0b
 	PORTD = 0b00000111; // 0b
 	bool on=false;
 	bool flagOnOff = false;
 	bool flagMode = false;
+	bool flagSpeed = false; 
 	int mode = 1;
 	int step = 1;
+	int speed = 1;
 	while (1)
 	{
-		//but1(&flagOnOff,&on);
-		but2(&flagOnOff, &on, &mode, &step, &flagMode);
+		but1(&flagOnOff,&on);
+		but2(&flagMode, &mode);
+		but3(&flagSpeed,&speed);
+		light(&on, &mode, &step, &speed);
 	}
 }
 
-void but1(bool* flagOnOff, bool* on)
+void light(bool* on, int* mode, int* step, int* speed)
 {
-	onORoff_Click(flagOnOff, on);
-	
-	if (*on)
-	{
-		PORTD = 1;
-	}
-	else
-	{
-		PORTD = 0;
-	}
-}
-
-void but2(bool* flagOnOff, bool* on, int* mode, int* step, bool* flagMode)
-{
-	onORoff_Click(flagOnOff, on);
-	mode_Click(flagMode, mode, step);
-	
 	if (*on)
 	{
 		result(mode, step);
-		_delay_ms(1000);
+		Delay(speed);
 		nextStep(step);
 	}
 	else
 	{
 		PORTD = 0;
 	}
+}
+
+void Delay(int* speed)
+{
+	if((*speed) == 1)	
+	{
+		_delay_ms(400);
+	}
+	else if((*speed)==2)
+	{
+		_delay_ms(200);
+	}
+	else if((*speed)==3)
+	{
+		_delay_ms(100);
+	}
+}
+
+void but1(bool* flagOnOff, bool* on)
+{
+	onORoff_Click(flagOnOff, on);
+}
+
+void but2(bool* flagMode,int* mode)
+{
+	mode_Click(flagMode, mode);
+}
+
+void but3(bool* flagSpeed,int* speed)
+{
+	speed_Click(flagSpeed, speed);
 }
 
 void onORoff_Click(bool* flagOnOff, bool* on)
@@ -77,7 +100,7 @@ void onORoff_Click(bool* flagOnOff, bool* on)
 }
 
 
-void mode_Click(bool* flagMode, int* mode, int* step)
+void mode_Click(bool* flagMode, int* mode)
 {
 	if(PINB & 0b00000010)
 	{
@@ -93,12 +116,37 @@ void mode_Click(bool* flagMode, int* mode, int* step)
 	}
 }
 
+void speed_Click(bool* flagSpeed, int* speed)
+{
+	if(PINB & 0b00000100)
+	{
+		if ((*flagSpeed)==false)
+		{
+			(*flagSpeed) = true;
+			nextMode(speed);
+		}
+	}
+	else
+	{
+		(*flagSpeed) = false;
+	}
+}
+
 void nextMode(int* mode)
 {
 	(*mode) = (*mode) + 1;
 	if ((*mode) == 4)
 	{
 		(*mode) = 1;
+	}
+}
+
+void nextSpeed(int* speed)
+{
+	(*speed) = (*speed) + 1;
+	if ((*speed) == 4)
+	{
+		(*speed) = 1;
 	}
 }
 
