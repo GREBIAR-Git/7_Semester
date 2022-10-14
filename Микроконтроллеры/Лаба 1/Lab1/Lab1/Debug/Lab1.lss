@@ -3,29 +3,29 @@ Lab1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800200  00800200  0000018c  2**0
+  0 .data         00000000  00800200  00800200  0000019a  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000138  00000000  00000000  00000054  2**1
+  1 .text         00000146  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  0000018c  2**0
+  2 .comment      00000030  00000000  00000000  0000019a  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001bc  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001cc  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000028  00000000  00000000  000001fc  2**0
+  4 .debug_aranges 00000048  00000000  00000000  0000020c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000b1a  00000000  00000000  00000224  2**0
+  5 .debug_info   00000c21  00000000  00000000  00000254  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000a48  00000000  00000000  00000d3e  2**0
+  6 .debug_abbrev 00000aa9  00000000  00000000  00000e75  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002d1  00000000  00000000  00001786  2**0
+  7 .debug_line   000003c3  00000000  00000000  0000191e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000044  00000000  00000000  00001a58  2**2
+  8 .debug_frame  00000090  00000000  00000000  00001ce4  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000004c9  00000000  00000000  00001a9c  2**0
+  9 .debug_str    000004f2  00000000  00000000  00001d74  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000008c  00000000  00000000  00001f65  2**0
+ 10 .debug_loc    000001cb  00000000  00000000  00002266  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000018  00000000  00000000  00001ff1  2**0
+ 11 .debug_ranges 00000038  00000000  00000000  00002431  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -141,101 +141,70 @@ Disassembly of section .text:
   d2:	d1 e2       	ldi	r29, 0x21	; 33
   d4:	de bf       	out	0x3e, r29	; 62
   d6:	cd bf       	out	0x3d, r28	; 61
-  d8:	1a d0       	rcall	.+52     	; 0x10e <main>
-  da:	2c c0       	rjmp	.+88     	; 0x134 <_exit>
+  d8:	20 d0       	rcall	.+64     	; 0x11a <main>
+  da:	33 c0       	rjmp	.+102    	; 0x142 <_exit>
 
 000000dc <__bad_interrupt>:
   dc:	91 cf       	rjmp	.-222    	; 0x0 <__vectors>
 
-000000de <but1>:
-	}
-}
-
-void but1(bool* flag, bool* on)
-{
-	if(PINB & 1)
+000000de <onORoff>:
   de:	18 9b       	sbis	0x03, 0	; 3
-  e0:	0b c0       	rjmp	.+22     	; 0xf8 <but1+0x1a>
-	{
-		if ((*flag)==false)
+  e0:	0b c0       	rjmp	.+22     	; 0xf8 <onORoff+0x1a>
   e2:	fc 01       	movw	r30, r24
   e4:	20 81       	ld	r18, Z
   e6:	21 11       	cpse	r18, r1
-  e8:	09 c0       	rjmp	.+18     	; 0xfc <but1+0x1e>
-		{
-			(*flag) = true;
+  e8:	09 c0       	rjmp	.+18     	; 0xfc <onORoff+0x1e>
   ea:	21 e0       	ldi	r18, 0x01	; 1
   ec:	20 83       	st	Z, r18
-			(*on) = !(*on);
   ee:	fb 01       	movw	r30, r22
   f0:	80 81       	ld	r24, Z
   f2:	28 27       	eor	r18, r24
   f4:	20 83       	st	Z, r18
-  f6:	02 c0       	rjmp	.+4      	; 0xfc <but1+0x1e>
-		}
-	}
-	else
-	{
-		(*flag) = false;
+  f6:	08 95       	ret
   f8:	fc 01       	movw	r30, r24
   fa:	10 82       	st	Z, r1
-	}
-	
-	if (*on)
-  fc:	fb 01       	movw	r30, r22
-  fe:	80 81       	ld	r24, Z
- 100:	88 23       	and	r24, r24
- 102:	19 f0       	breq	.+6      	; 0x10a <but1+0x2c>
-	{
-		PORTD = 1;
- 104:	81 e0       	ldi	r24, 0x01	; 1
- 106:	8b b9       	out	0x0b, r24	; 11
- 108:	08 95       	ret
-	}
-	else
-	{
-		PORTD = 0;
- 10a:	1b b8       	out	0x0b, r1	; 11
- 10c:	08 95       	ret
+  fc:	08 95       	ret
 
-0000010e <main>:
-#include <stdio.h>
+000000fe <but1>:
+  fe:	cf 93       	push	r28
+ 100:	df 93       	push	r29
+ 102:	eb 01       	movw	r28, r22
+ 104:	ec df       	rcall	.-40     	; 0xde <onORoff>
+ 106:	88 81       	ld	r24, Y
+ 108:	88 23       	and	r24, r24
+ 10a:	19 f0       	breq	.+6      	; 0x112 <but1+0x14>
+ 10c:	81 e0       	ldi	r24, 0x01	; 1
+ 10e:	8b b9       	out	0x0b, r24	; 11
+ 110:	01 c0       	rjmp	.+2      	; 0x114 <but1+0x16>
+ 112:	1b b8       	out	0x0b, r1	; 11
+ 114:	df 91       	pop	r29
+ 116:	cf 91       	pop	r28
+ 118:	08 95       	ret
 
-void but1(bool*,bool*);
+0000011a <main>:
+ 11a:	cf 93       	push	r28
+ 11c:	df 93       	push	r29
+ 11e:	00 d0       	rcall	.+0      	; 0x120 <main+0x6>
+ 120:	cd b7       	in	r28, 0x3d	; 61
+ 122:	de b7       	in	r29, 0x3e	; 62
+ 124:	81 e0       	ldi	r24, 0x01	; 1
+ 126:	8a b9       	out	0x0a, r24	; 10
+ 128:	14 b8       	out	0x04, r1	; 4
+ 12a:	15 b8       	out	0x05, r1	; 5
+ 12c:	87 e0       	ldi	r24, 0x07	; 7
+ 12e:	8b b9       	out	0x0b, r24	; 11
+ 130:	19 82       	std	Y+1, r1	; 0x01
+ 132:	1a 82       	std	Y+2, r1	; 0x02
+ 134:	be 01       	movw	r22, r28
+ 136:	6f 5f       	subi	r22, 0xFF	; 255
+ 138:	7f 4f       	sbci	r23, 0xFF	; 255
+ 13a:	ce 01       	movw	r24, r28
+ 13c:	02 96       	adiw	r24, 0x02	; 2
+ 13e:	df df       	rcall	.-66     	; 0xfe <but1>
+ 140:	f9 cf       	rjmp	.-14     	; 0x134 <main+0x1a>
 
-int main(void)
-{
- 10e:	cf 93       	push	r28
- 110:	df 93       	push	r29
- 112:	00 d0       	rcall	.+0      	; 0x114 <main+0x6>
- 114:	cd b7       	in	r28, 0x3d	; 61
- 116:	de b7       	in	r29, 0x3e	; 62
-	DDRD = 1; // 0x
- 118:	81 e0       	ldi	r24, 0x01	; 1
- 11a:	8a b9       	out	0x0a, r24	; 10
-	DDRB = 0; // 0x
- 11c:	14 b8       	out	0x04, r1	; 4
-	PORTB = 0; // 0b
- 11e:	15 b8       	out	0x05, r1	; 5
-	PORTD = 1; // 0b
- 120:	8b b9       	out	0x0b, r24	; 11
-	bool on=false;
- 122:	19 82       	std	Y+1, r1	; 0x01
-	bool flag = false;
- 124:	1a 82       	std	Y+2, r1	; 0x02
-	while (1)
-	{
-		but1(&flag,&on);
- 126:	be 01       	movw	r22, r28
- 128:	6f 5f       	subi	r22, 0xFF	; 255
- 12a:	7f 4f       	sbci	r23, 0xFF	; 255
- 12c:	ce 01       	movw	r24, r28
- 12e:	02 96       	adiw	r24, 0x02	; 2
- 130:	d6 df       	rcall	.-84     	; 0xde <but1>
- 132:	f9 cf       	rjmp	.-14     	; 0x126 <main+0x18>
+00000142 <_exit>:
+ 142:	f8 94       	cli
 
-00000134 <_exit>:
- 134:	f8 94       	cli
-
-00000136 <__stop_program>:
- 136:	ff cf       	rjmp	.-2      	; 0x136 <__stop_program>
+00000144 <__stop_program>:
+ 144:	ff cf       	rjmp	.-2      	; 0x144 <__stop_program>
