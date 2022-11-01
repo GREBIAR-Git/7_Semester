@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <util/delay.h>
 
+#define F_CPU;
+
 void but1(bool* flagOnOff,bool* on);
 void nextMode(int* mode);
 void nextStep(int* step);
@@ -18,10 +20,8 @@ void Delay(int* speed);
 
 int main(void)
 {
-	DDRD = 0b00000111; // 0x
 	DDRB = 0; // 0x
-	PORTB = 0; // 0b
-	PORTD = 0b00000111; // 0b
+	DDRD = 0b00000111; // 0x
 	bool on=false;
 	bool flagOnOff = false;
 	bool flagMode = false;
