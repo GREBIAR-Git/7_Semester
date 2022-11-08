@@ -2,6 +2,8 @@ Git (Лукьянов)/92PG/temp/*
 Git (Лукьянов)/92PG/log/*.tmp
 *.vs/
 *.vscode/
-*vs/
+**vs/
 Оптимизация (Лукьянов)/**/bin/
 Оптимизация (Лукьянов)/**/obj/
+*.workspace
+Микроконтроллеры/**/Project Backups
