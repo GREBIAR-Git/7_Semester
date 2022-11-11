@@ -16,66 +16,21 @@ bool on = false;
 int mode = 1;
 int step = 1;
 int speed = 1;
-bool tactMode = false;
 
 int main(void)
 {
 	DDRD = 0;
-	DDRB = 0b11111111;
-	EICRA = 0b11111111;
-	EIMSK = 0b00001111;
-	GTCCR = 0b00000000;
-
-	TIMSK0 = 0b00000111;
-	OCR0A = 0b1010101;
-	OCR0B = 0b10101010;
-	TCCR0B = 0b00000101;
-	TCCR0A = 0b00000000;
+	DDRB = 0b00000111;
+	EICRA = 0b00111111;
+	EIMSK = 0b00000111;
 	
 	sei();
 	
 	while (1)
 	{
-		//light(&on, &mode, &step, &speed);
-	}
-	
-}
-
-ISR(TIMER0_OVF_vect)
-{
-	
-		if(speed==1||speed==2)
-		{
-			light(&on, &mode, &step, &speed);
-		}
-	
-}
-
-ISR(TIMER0_COMPA_vect)
-{
-	if(tactMode)
-	{
-		PORTB = PORTB << 1;
-		if(PORTB == 0b00001000)
-		{
-			PORTB = 1;
-		}
-	}
-	else
-	{
-		if(speed==1)
-		{
-			light(&on, &mode, &step, &speed);
-		}	
-	}
-}
-
-ISR(TIMER0_COMPB_vect)
-{
-	if(speed==1||speed==2||speed==3)
-	{
 		light(&on, &mode, &step, &speed);
 	}
+	
 }
 
 ISR(INT0_vect)
@@ -93,31 +48,13 @@ ISR(INT2_vect)
 	nextValue(&speed);
 }
 
-ISR(INT3_vect)
-{
-	tactMode = !tactMode;
-	if(tactMode)
-	{
-		PORTB = 1;
-		OCR0A = 0b11111110;
-		TCCR0A = 0b00000010;
-		OCR0B = 0b11111111;
-	}
-	else
-	{
-		PORTB = 0;
-		OCR0A = 0b1010101;
-		OCR0B = 0b10101010;
-		TCCR0A = 0b00000000;
-	}
-}
-
 void light(bool* on, int* mode, int* step, int* speed)
 {
-	if (*on&&!tactMode)
+	if (*on)
 	{
 		result(mode, step);
-		nextValue(step);	
+		Delay(speed);
+		nextValue(step);
 	}
 	else
 	{
