@@ -9,7 +9,7 @@ namespace lab3
     // можно без рекурсии сразу по формуле овала попробовать
     internal class Program
     {
-        public struct Point
+        struct Point
         {
             public int X;
             public int Y;
@@ -21,29 +21,20 @@ namespace lab3
             }
         }
 
-        static int n, m;
-        static double minTime;
+        static byte n, m;
+        static double minTime = double.MaxValue;
+        const int g = 10;
 
         static void Main(string[] args)
         {
-            //Console.WriteLine("Start");
             string str = Console.ReadLine();
-            n = int.Parse(str.Split(' ')[0]);
-            m = int.Parse(str.Split(' ')[1]);
-            List<Point> planks = new List<Point>();
-            if (false) // ручной ввод досок
-            {
-                planks = CustomPath();
-                double time = CalculateTime(planks);
-                Console.WriteLine("Result: " + time.ToString() + "\n\n\n");
-                return;
-            }
-            minTime = double.MaxValue;
-            Go(new Point(0, 0), planks);
+            n = byte.Parse(str.Split(' ')[0]);
+            m = byte.Parse(str.Split(' ')[1]);
+            Go(new Point(0, 0), new Point[(n+m)*2],0);
             Console.WriteLine(minTime);
         }
 
-        public static List<Point> ClonePlanks(List<Point> planks)
+        static List<Point> ClonePlanks(List<Point> planks)
         {
             List<Point> newPlanks = new List<Point>();
             foreach (Point plank in planks)
@@ -53,74 +44,65 @@ namespace lab3
             return newPlanks;
         }
 
-        public static void Go(Point point, List<Point> planks)
+        static void Go(Point point, Point[] planks, int size)
         {
             if (point.X == n && point.Y == m)
             {
-                double time = CalculateTime(planks);
-                if (time < minTime)
-                {
-                    minTime = time;
-                }
+                CalculateAllTime(planks,size);
             }
             else
             {
-                for(int i = point.X; i <= n; i++)
+                for (int i = point.X; i <= n; i++)
                 {
                     for (int j = point.Y + 1; j <= m; j++)
                     {
                         if (!(j == m && i != n))
                         {
                             Point newPoint = new Point(i, j);
-                            List<Point> newPlanks = ClonePlanks(planks);
-                            newPlanks.Add(newPoint);
-                            Go(newPoint,newPlanks);
+                            Point[] newPlanks = new Point[planks.Length];
+                            Array.Copy(planks, newPlanks, planks.Length);
+                            newPlanks[size]= newPoint;
+                            if(size>1)
+                            {
+
+                            }
+                            Go(newPoint, newPlanks, size+1);
                         }
                     }
                 }
             }
         }
 
-        public static double CalculateTime(List<Point> planks)
+        static void CalculateAllTime(Point[] planks, int size)
         {
-            int g = 10;
             double time = 0;
-            double speed = 0; // скорость не падает на поворотах
-            for (int i = 0; i < planks.Count; i++)
+            double speed = 0;
+            time += CalculateTime(planks[0], new Point(0,0), ref speed);
+            if(time>minTime)
             {
-                Point plank = planks[i];
-                //Console.WriteLine($"Plank[{i}] = ({plank.X},{plank.Y})");
-                Point prev_plank = i > 0 ? planks[i - 1] : new Point(0, 0);
-                double plank_length = Math.Sqrt(Math.Pow(plank.X - prev_plank.X, 2) + Math.Pow(plank.Y - prev_plank.Y, 2));
-                double cos_a = (double)(plank.Y - prev_plank.Y) / (plank_length);
-                //Console.WriteLine("Plank " + (i + 1).ToString() + " length == " + plank_length.ToString());
-                //Console.WriteLine("Plank " + (i + 1).ToString() + " angle == " + (Math.Acos(cos_a) * (180 / Math.PI)).ToString());
-                double plank_time = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g * cos_a * plank_length) - speed) / (g * cos_a);
-
-                speed += g * cos_a * plank_time;
-                time += plank_time;
+                return;
             }
-            //Console.WriteLine($"time = {time}");
-
-            return time;
+            for (int i = 1; i < size; i++)
+            {
+                time += CalculateTime(planks[i], planks[i-1], ref speed);
+                if (time > minTime)
+                {
+                    return;
+                }
+            }
+            if (time < minTime)
+            {
+                minTime = time;
+            }
         }
 
-        public static List<Point> CustomPath()
+        static double CalculateTime(Point current, Point prev,ref double speed)
         {
-            Console.WriteLine("Planks:");
-            List<Point> planks = new List<Point>();
-            while (true)
-            {
-                try
-                {
-                    planks.Add(new Point(Int32.Parse(Console.ReadLine()), Int32.Parse(Console.ReadLine())));
-                }
-                catch (Exception e)
-                {
-                    break; // нецелое число = конец ввода, построение пути завершено
-                }
-            }
-            return planks;
+            double plank_length = Math.Sqrt(Math.Pow(current.X - prev.X, 2) + Math.Pow(current.Y - prev.Y, 2));
+            double cos_a = (double)(current.Y - prev.Y) / (plank_length);
+            double plank_time = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g * cos_a * plank_length) - speed) / (g * cos_a);
+            speed += g * cos_a * plank_time;
+            return plank_time;
         }
     }
 }
