@@ -1,9 +1,9 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-namespace labs
+namespace lab2
 {
     class lab
     {
@@ -35,7 +35,7 @@ namespace labs
         {
             Console.ReadLine();
             List<long> distance = new List<long>();
-            distance = Array.ConvertAll(Console.ReadLine().Split(" "), s => long.Parse(s)).ToList();
+            distance = Array.ConvertAll(Console.ReadLine().Split(' '), s => long.Parse(s)).ToList();
             return distance;
         }
 
@@ -44,4 +44,4 @@ namespace labs
             Console.WriteLine(i / speedCar);
         }
     }
-}*/
+}
