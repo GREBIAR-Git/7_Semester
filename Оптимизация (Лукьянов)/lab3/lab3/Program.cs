@@ -31,69 +31,11 @@ namespace lab3
             n = byte.Parse(str.Split(' ')[0]);
             m = byte.Parse(str.Split(' ')[1]);
             Go(new Point(0, 0), new Point[(n + m) * 2], 0, 0, 0);
-
-
-            Console.WriteLine("\n\n\n");
-            // x и y - координаты искомой точки
-            // (x+a) ^ 2 / a ^ 2 + y ^ 2 / b ^ 2 = 1; эллипс   a = n, b = m
-            // y = sqrt(b^2-x^2*b^2/a^2) = (sqrt(b^2 * (1 - x^2/a^2)))
-            int a = n;
-            int b = m;
-            List<Point> ellipsePoints = new List<Point>();
-            if (a>b)
-            {
-                // поделить отрезок на например (n+m)*2 частей и искать ближайшую точку каждый раз? и удалить дубликаты
-                double parts_number = (n + m) * 2; // n = parts_number / 2 - m
-                for (int i = 0; i < parts_number; i++)
-                {
-                    double x = Math.Ceiling(i / Math.Ceiling(parts_number / (double)n));
-                    double y = Math.Sqrt(Math.Pow(b, 2) * (1 - Math.Pow(x-a, 2) / Math.Pow(a, 2)));
-                    Console.WriteLine(x + " " + y);
-                    if (Math.Abs(y-Math.Round(y)) < 0.05)
-                    {
-                        ellipsePoints.Add(new Point((int)Math.Round(x), (int)Math.Round(y)));
-                    }
-                }
-                ellipsePoints = ellipsePoints.Distinct().ToList();
-                Console.WriteLine("\n\n\n");
-            }
-            else if (a == b)
-            {
-                // круг
-            }
-            else
-            {
-                // перевернуть эллипс
-                // поделить отрезок на например (n+m)*2 частей и искать ближайшую точку каждый раз? и удалить дубликаты
-                double parts_number = (n + m) * 2; // n = parts_number / 2 - m
-                for (int i = 0; i < parts_number; i++)
-                {
-                    double x = i * (n / (double)parts_number);
-                    double y = Math.Sqrt(Math.Pow(b, 2) - Math.Pow(x, 2) * Math.Pow(b, 2) / Math.Pow(a, 2));
-                    Console.WriteLine(x + " " + y);
-                    ellipsePoints.Add(new Point((int)Math.Round(x), (int)Math.Round(y)));
-                }
-                ellipsePoints = ellipsePoints.Distinct().ToList();
-                Console.WriteLine("\n\n\n");
-            }
-
-
-            // ax ^ 2 + bx + c = 0; парабола  откуда брать a b и с хз
-            // D = b^2 - 4 * a * c
-            // x = (-b + sqrt(D)) / (2 * a)
-
-
-
-            foreach (Point point in points)
+            foreach(Point point in points)
             {
                 Console.WriteLine(point.X + " " + point.Y);
             }
             Console.WriteLine(minTime);
-
-            foreach (Point point in ellipsePoints)
-            {
-                Console.WriteLine(point.X + " " + point.Y);
-            }
         }
 
         static Point[] points;
