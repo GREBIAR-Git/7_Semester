@@ -27,72 +27,71 @@ namespace lab3
 
         static void Main(string[] args)
         {
-            string str = Console.ReadLine();
-            n = byte.Parse(str.Split(' ')[0]);
-            m = byte.Parse(str.Split(' ')[1]);
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            string[] str = Console.ReadLine().Split(' ');
+            n = byte.Parse(str[0]);
+            m = byte.Parse(str[1]);
             Go(new Point(0, 0), new Point[(n + m) * 2], 0, 0, 0);
-            foreach(Point point in points)
-            {
-                Console.WriteLine(point.X + " " + point.Y);
-            }
             Console.WriteLine(minTime);
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds);
         }
 
-        static Point[] points;
 
         static void Go(Point point, Point[] planks, int size, double speed, double time)
         {
-            if (point.X == n && point.Y == m)
+            for (int j = point.Y + 1; j < m; j++)//вертикаль
             {
-                points = planks;
-                minTime = time;
-            }
-            else
-            {
-                for (int i = point.X; i <= n; i++)//горизонталь
+                for (int i = point.X; i < j+1 && i < n; i++)//горизонталь
                 {
-                    for (int j = point.Y + 1; j <= m; j++)//вертикаль
+                    Point newPoint = new Point(i, j);
+                    double tempSpeed = speed;
+                    double tempTime = time;
+                    if (size == 0)
                     {
-                        if (j != m || i == n)
-                        {
-                            Next(new Point(i, j), point, planks, size, speed, time);
-                        }
+                        tempTime += CalculateTime(newPoint, point, ref tempSpeed);
                     }
+                    else
+                    {
+                        tempTime += CalculateTime(newPoint, planks[size - 1], ref tempSpeed);
+                    }
+                    if (tempTime > minTime)
+                    {
+                        return;
+                    }
+                    Point[] newPlanks = new Point[planks.Length];
+                    Array.Copy(planks, newPlanks, planks.Length);
+                    newPlanks[size] = newPoint;
+                    Go(newPoint, newPlanks, size + 1, tempSpeed, tempTime);
                 }
             }
-        }
 
-        static void Next(Point newPoint, Point point, Point[] planks, int size, double speed, double time)
-        {
+
             if (size == 0)
             {
-                time += CalculateTime(newPoint, point, ref speed);
-                if (time > minTime)
-                {
-                    return;
-                }
+                time += CalculateTime(new Point(n, m), point, ref speed);
             }
             else
             {
-                time += CalculateTime(newPoint, planks[size - 1], ref speed);
-                if (time > minTime)
-                {
-                    return;
-                }
+                time += CalculateTime(new Point(n, m), planks[size - 1], ref speed);
             }
-            Point[] newPlanks = new Point[planks.Length];
-            Array.Copy(planks, newPlanks, planks.Length);
-            newPlanks[size] = newPoint;
-            Go(newPoint, newPlanks, size + 1, speed, time);
+            if (time > minTime)
+            {
+                return;
+            }
+            minTime = time;
         }
 
         static double CalculateTime(Point current, Point prev, ref double speed)
         {
-            double plank_length = Math.Sqrt(Math.Pow(current.X - prev.X, 2) + Math.Pow(current.Y - prev.Y, 2));
-            double cos_a = (current.Y - prev.Y) / (plank_length);
-            double plank_time = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g * cos_a * plank_length) - speed) / (g * cos_a);
-            speed += g * cos_a * plank_time;
-            return plank_time;
+            double y1 = current.Y - prev.Y;
+            double plank_length = Math.Sqrt(Math.Pow(current.X - prev.X, 2) + Math.Pow(y1, 2));
+            double cos_a = y1 / plank_length;
+            double g1 = g * cos_a;
+            double speed1 = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g1 * plank_length) - speed);
+            speed += speed1;
+            return speed1 / g1;
         }
 
         /*
