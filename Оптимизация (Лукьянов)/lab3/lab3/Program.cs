@@ -24,6 +24,7 @@ namespace lab3
         static byte n, m;
         static double minTime = double.MaxValue;
         const int g = 10;
+        static List<double> testMins = new List<double>();
 
         static void Main(string[] args)
         {
@@ -36,6 +37,7 @@ namespace lab3
             Console.WriteLine(minTime);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
+            Console.WriteLine(testMins.Count() - testMins.Distinct().Count());
         }
 
 
@@ -91,6 +93,7 @@ namespace lab3
             double g1 = g * cos_a;
             double speed1 = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g1 * plank_length) - speed);
             speed += speed1;
+            testMins.Add(speed1 / g1);
             return speed1 / g1;
         }
 
