@@ -10,10 +10,6 @@ namespace lab3
 
         static Data[,] data;
 
-        static Dictionary<int, double> speeds = new Dictionary<int, double>();
-        static Dictionary<Point, double> times = new Dictionary<Point, double>();
-
-
         static void Go(int r, int h)
         {
             // перебираем все точки
@@ -25,7 +21,7 @@ namespace lab3
                     // перебираем все точки до нее (предыдущие)
                     for (int a = 0; a <= i; a++) // a-й столбец, <= т.к. можно ровно вниз
                     {
-                        for (int b = a; b < j; b++) // b-я строка, < т.к. нельзя горизонтально идти (по той же строке)
+                        for (int b = 0; b < j; b++) // b-я строка, < т.к. нельзя горизонтально идти (по той же строке)
                         {
                             // считаем время
                             CalculateTime(new Point(i, j), new Point(a, b));
@@ -42,38 +38,60 @@ namespace lab3
             m = byte.Parse(str[1]);
             //times[new Point(0, 0)] = 0;
             data = new Data[n + 1, m + 1];
-            data[0, 0] = new Data(0, 0);
-            for (int i = 1; i < m; i++)//горизонталь
+            for (int i = 0; i <= n; i++) // i-й столбец
             {
-                for (int j = 0; j < i + 1 && j <= n; j++)//вертикаль
+                for (int j = 0; j <= m; j++) // j-я строка
                 {
                     data[i, j] = new Data();
                 }
             }
-            data[m, n] = new Data();
+            data[0, 0] = new Data(0, 0);
+            data[n, m] = new Data();
             Go(0, 0);
-            Console.WriteLine(times[new Point(n, m)]);
+            Console.WriteLine(data[n, m].Time);
         }
 
         static void CalculateTime(Point current, Point prev)
         {
-            if (!speeds.ContainsKey(prev.Y))
+            if (data[prev.X, prev.Y].Speed == double.MaxValue)
             {
-                speeds.Add(prev.Y, Math.Sqrt(2 * g * prev.Y));
+                data[prev.X, prev.Y].Speed = Math.Sqrt(2 * g * prev.Y);
             }
-            double speed = speeds[prev.Y];
+            double speed = data[prev.X, prev.Y].Speed;
 
             double y1 = current.Y - prev.Y;
             double plank_length = Math.Sqrt(Math.Pow(current.X - prev.X, 2) + Math.Pow(y1, 2));
             double cos_a = y1 / plank_length;
             double g1 = g * cos_a;
             double speed1 = (Math.Sqrt(Math.Pow(speed, 2) + 2 * g1 * plank_length) - speed);
-            double time = times[prev] + speed1 / g1;
+            double time = data[prev.X, prev.Y].Time + speed1 / g1;
 
-            if (!times.ContainsKey(current) || time < times[current])
+            if (time < data[current.X, current.Y].Time)
             {
-                times[current] = time;
+                data[current.X, current.Y].Time = time;
             }
+        }
+
+        static void PrintData()
+        {
+            Console.WriteLine();
+            for (int i = 0; i <= n; i++)
+            {
+                string str = string.Empty;
+                for (int j = 0; j <= m; j++)
+                {
+                    if (data[i, j] == null || data[i, j].Time == double.MaxValue)
+                    {
+                        str = "0,000 " + str;
+                    }
+                    else
+                    {
+                        str = string.Format("{0:0.000}", Math.Round(data[i, j].Time, 3)) + " " + str;
+                    }
+                }
+                Console.WriteLine(str);
+            }
+            Console.WriteLine();
         }
     }
 
