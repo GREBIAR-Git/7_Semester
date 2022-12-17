@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "drawing"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c",
+			"g_var.h": "c",
+			"menutools.h": "c",
+			"elements.h": "c",
+			"winmain.h": "c",
+			"buttonevents.h": "c",
+			"modules.h": "c",
+			"windows.h": "c",
+			"menusettings.h": "c"
+		}
+	}
+}
