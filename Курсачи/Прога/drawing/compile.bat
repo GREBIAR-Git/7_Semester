@@ -6,7 +6,7 @@ if "%ERRORLEVEL%"=="0" taskkill /IM drawing.exe
 IF EXIST "drawing.exe" (
 del "drawing.exe"
 )
-gcc -I ./headers ./source/* -lgdi32 -w -o "drawing.exe"
+gcc -I ./headers ./source/* -lgdi32 -o "drawing.exe"
 IF EXIST "drawing.exe" (
 start drawing.exe
 ) ELSE (

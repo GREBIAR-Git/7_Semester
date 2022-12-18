@@ -38,4 +38,5 @@ int DrawUI(HDC hdc, RECT window)
     DrawMenuButton(hdc, "Right");
     DrawMenuButton(hdc, "Up");
     DrawMenuButton(hdc, "Down");
+    DrawMenuButton(hdc, "Version Control");
 }

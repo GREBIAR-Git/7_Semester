@@ -7,7 +7,7 @@
 #include "MenuTools.h"
 #include "MenuSettings.h"
 
-void RotateElements();
+void NextElem();
 BOOL Line(HDC hdc, int x1, int y1, int x2, int y2);
 PointD Zoom(double x,double y,RECT window);
 PointD ZoomReverce(double x,double y,RECT window);
@@ -16,6 +16,6 @@ VOID UpdateWin1(HWND hwnd,RECT window);
 VOID ZoomRectangle(RECT window,int x1, int y1, int x2, int y2);
 VOID DrawAxes(HDC memDc,RECT window);
 LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-int MenuButtonPressed(HWND hwnd);
+int MenuButtonPressed(HWND hwnd, BOOL skip_processing);
 
 #endif

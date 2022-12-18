@@ -4,7 +4,7 @@
 #include <windows.h>
 #include "Elements.h"
 
-#define SizeElement 500
+#define elemBufferSize 500*1024*1024/48 // 500MB (1 elem = 48 bytes)
 #define shapeLine 1
 #define shapeRectangle 2
 #define shapeEllipse 3

@@ -2,11 +2,14 @@
 
 extern BOOL drawing;
 extern TypeElement currentElement;
-extern Element elem[SizeElement];
-extern int countElement;
+extern Element elem[elemBufferSize];
+extern int currentIndex;
+extern int elemCount;
 extern Display display;
 extern BOOL zooming;
 extern POINT p1;
+
+int step = 50;
 
 ButtonLine()
 {
@@ -59,21 +62,26 @@ ButtonZoomOut(HWND hwnd)
 }
 ButtonLeft(HWND hwnd)
 {
-    display.center.x+=1;
+    display.center.x+=step;
     UpdateWin(hwnd);
 }
 ButtonRight(HWND hwnd)
 {
-    display.center.x-=1;
+    display.center.x-=step;
     UpdateWin(hwnd);
 }
 ButtonUp(HWND hwnd)
 {
-    display.center.y+=1;
+    display.center.y+=step;
     UpdateWin(hwnd);
 }
 ButtonDown(HWND hwnd)
 {
-    display.center.y-=1;
+    display.center.y-=step;
+    UpdateWin(hwnd);
+}
+ButtonVersionControl(HWND hwnd)
+{
+    printf("hello, version control\n");
     UpdateWin(hwnd);
 }

@@ -2,8 +2,9 @@
 
 extern BOOL drawing;
 extern TypeElement currentElement;
-extern Element elem[SizeElement];
-extern int countElement;
+extern Element elem[elemBufferSize];
+extern int currentIndex;
+extern int elemCount;
 extern Display display;
 extern BOOL zooming;
 extern POINT p1;
@@ -11,14 +12,12 @@ extern POINT p1;
 extern struct menu menu;
 extern char debugLine[500];
 
-void RotateElements()
+void NextElem()
 {
-	Element first = elem[0];
-	for (int i = 0; i < SizeElement; i++)
-	{
-		elem[i] = elem[i + 1];
-	}
-	elem[0] = first;
+	currentIndex++;
+	elemCount++;
+	if (elemCount > elemBufferSize) elemCount = elemBufferSize;
+	if (currentIndex > elemCount - 1) currentIndex = 0;
 }
 
 BOOL Line(HDC hdc, int x1, int y1, int x2, int y2)
@@ -92,7 +91,7 @@ VOID DrawAxes(HDC memDc,RECT window)
 
 LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch (Message) {
-	case WM_CREATE: 
+	case WM_CREATE:
 	{
 		ShowWindow(hwnd, SW_SHOWMAXIMIZED);
 		RECT window;
@@ -103,46 +102,45 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		display.zoom.y=1;
 		display.center.x = 0;
 		display.center.y = 0;
-		countElement = 0;
+		currentIndex = 0;
+		elemCount = 1;
 		UpdateWin1(hwnd,window);
 		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
-		if (!MenuButtonPressed(hwnd))
-		{
-			if (countElement >= SizeElement - 1)
-			{
-				countElement--;
-				RotateElements();
-			}
-			RECT window;
-			GetClientRect(hwnd,&window);
-			PointD firstPoint = ZoomReverce(LOWORD(lParam), HIWORD(lParam), window);
-			elem[countElement].coords.point1 = firstPoint;
-			elem[countElement].typeElement.shape = currentElement.shape;
-			elem[countElement].typeElement.colour = currentElement.colour;
-			elem[countElement].typeElement.size = currentElement.size;
-			drawing = TRUE;
-		}
+		if (MenuButtonPressed(hwnd, FALSE)) break;
+
+		RECT window;
+		GetClientRect(hwnd,&window);
+		PointD firstPoint = ZoomReverce(LOWORD(lParam), HIWORD(lParam), window);
+		elem[currentIndex].coords.point1 = firstPoint;
+		elem[currentIndex].typeElement.shape = currentElement.shape;
+		elem[currentIndex].typeElement.colour = currentElement.colour;
+		elem[currentIndex].typeElement.size = currentElement.size;
+		drawing = TRUE;
 		break;
 	}
 	case WM_MOUSEMOVE:
 	{
+		if (!drawing) break;
+
 		RECT window;
 		GetClientRect(hwnd,&window);
 		PointD secondPoint = ZoomReverce(LOWORD(lParam), HIWORD(lParam), window);
-		elem[countElement].coords.point2 = secondPoint;
+		elem[currentIndex].coords.point2 = secondPoint;
 		UpdateWin1(hwnd,window);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
-		//drawing = FALSE;
+		if (MenuButtonPressed(hwnd, TRUE)) break;
 
-		if (countElement < SizeElement - 1) 
-			countElement++;
-
+		drawing = FALSE;
+		NextElem();
+		RECT window;
+		GetClientRect(hwnd,&window);
+		UpdateWin1(hwnd,window);
 		break;
 	}
 	case WM_RBUTTONDOWN:
@@ -154,14 +152,13 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 	}
 	case WM_RBUTTONUP:
 	{
-		if (zooming)
-		{
-			zooming = FALSE;
-			RECT window;  
-			GetClientRect(hwnd, &window);
-			ZoomRectangle(window, p1.x, p1.y, LOWORD(lParam), HIWORD(lParam));
-			UpdateWin(hwnd);
-		}
+		if (!zooming) break;
+
+		zooming = FALSE;
+		RECT window;  
+		GetClientRect(hwnd, &window);
+		ZoomRectangle(window, p1.x, p1.y, LOWORD(lParam), HIWORD(lParam));
+		UpdateWin(hwnd);
 		break;
 	}
 	case WM_PAINT:
@@ -174,8 +171,8 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		HBITMAP bmp = CreateCompatibleBitmap(hdc, window.right, window.bottom);
 		SelectObject(memDc, bmp);
 		FillRect(memDc, &window, (HBRUSH)(RGB(255,255,255)));
-		DrawAxes(memDc, window);
-		for (int i = 0; i < countElement+1; i++)
+		//DrawAxes(memDc, window);
+		for (int i = 0; i < elemCount; i++)
 		{
 			double x1 = elem[i].coords.point1.x;
 			double y1 = elem[i].coords.point1.y;
@@ -217,8 +214,8 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		}
 		if(zooming)
 		{
-			double x1 = elem[countElement].coords.point2.x;
-			double y1 = elem[countElement].coords.point2.y;
+			double x1 = elem[currentIndex].coords.point2.x;
+			double y1 = elem[currentIndex].coords.point2.y;
 			PointD f1 = Zoom(x1,y1,window);
 			HPEN hPen = CreatePen(PS_DASH,3,RGB(255, 0, 0));
 			HBRUSH hBrush = GetStockObject(HOLLOW_BRUSH);
@@ -231,8 +228,9 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		DrawUI(memDc, window);
 
 		char str[4];
-		sprintf(str,"Zx-%lf; Zy-%lf; Cx-%lf; Cy-%lf;clientWin; X-%lu;Y-%lu;",display.zoom.x,display.zoom.y,display.center.x,display.center.y,window.right,window.bottom);
-		SetWindowText(hwnd, str);
+		//sprintf(str,"Zx-%lf; Zy-%lf; Cx-%lf; Cy-%lf;clientWin; X-%lu;Y-%lu;",display.zoom.x,display.zoom.y,display.center.x,display.center.y,window.right,window.bottom);
+		//sprintf(str,"sizeof(Element)=%d, sizeof(elem)=%d (%d)",sizeof(Element), sizeof(elem), sizeof(elem)/1024/1024);
+		//SetWindowText(hwnd, str);
 
 
 		BitBlt(hdc, 0, 0, window.right, window.bottom, memDc, 0, 0, SRCCOPY);
@@ -304,7 +302,7 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 	return 0;
 }
 
-int MenuButtonPressed(HWND hwnd)
+int MenuButtonPressed(HWND hwnd, BOOL skip_processing)
 {
 	POINT cursorCoords;
 	GetCursorPos(&cursorCoords);
@@ -312,77 +310,98 @@ int MenuButtonPressed(HWND hwnd)
 
 	if (CursorInsideArea(menu.buttons[0].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonLine();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[1].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonRect();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[2].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonEllipse();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[3].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonRed();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[4].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonGreen();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[5].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonBlue();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[6].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonWhite();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[7].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonSizePlus();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[8].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonSizeMinus();
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[9].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonZoomIn(hwnd);
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[10].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonZoomOut(hwnd);
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[11].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonLeft(hwnd);
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[12].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonRight(hwnd);
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[13].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonUp(hwnd);
 		return 1;
 	}
 	else if (CursorInsideArea(menu.buttons[14].area, cursorCoords))
 	{
+		if (skip_processing) return 2;
 		ButtonDown(hwnd);
+		return 1;
+	}
+	else if (CursorInsideArea(menu.buttons[15].area, cursorCoords))
+	{
+		if (skip_processing) return 2;
+		ButtonVersionControl(hwnd);
 		return 1;
 	}
 	else

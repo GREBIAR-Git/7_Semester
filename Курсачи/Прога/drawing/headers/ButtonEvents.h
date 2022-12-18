@@ -20,5 +20,6 @@ ButtonLeft(HWND hwnd);
 ButtonRight(HWND hwnd);
 ButtonUp(HWND hwnd);
 ButtonDown(HWND hwnd);
+ButtonVersionControl(HWND hwnd);
 
 #endif

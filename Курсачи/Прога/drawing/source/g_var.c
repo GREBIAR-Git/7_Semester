@@ -2,8 +2,9 @@
 
 BOOL drawing;
 TypeElement currentElement;
-Element elem[SizeElement];
-int countElement;
+Element elem[elemBufferSize];
+int currentIndex;
+int elemCount;
 Display display;
 BOOL zooming;
 POINT p1;
