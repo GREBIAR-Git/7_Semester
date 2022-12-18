@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include "g_var.h"
+#include "versionControl.h"
 
 ButtonLine();
 ButtonRect();

@@ -82,6 +82,6 @@ ButtonDown(HWND hwnd)
 }
 ButtonVersionControl(HWND hwnd)
 {
-    printf("hello, version control\n");
-    UpdateWin(hwnd);
+    initialize();
+    //commit();
 }
