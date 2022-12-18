@@ -82,6 +82,6 @@ ButtonDown(HWND hwnd)
 }
 ButtonVersionControl(HWND hwnd)
 {
-    initialize();
-    //commit();
+    //initialize();
+    commit();
 }

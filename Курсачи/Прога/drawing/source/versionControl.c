@@ -15,28 +15,29 @@ void initialize()
     CreateDirectoryA("./VersionControl", NULL);
     FILE *fptr = fopen("./VersionControl/BRANCHES.csv", "w");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
-    char * commitName = rand_string_alloc(commitNameSize);
+    char *commitName = rand_string_alloc(commitNameSize);
     fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commitName, commitName, commitName);
     fclose(fptr);
     // создать папку с начальным коммитом
-    char *full_path = "./VersionControl/";
-    charConcat(&full_path, &commitName);
+    char full_path[9999] = "./VersionControl/";
+    strcat(full_path, commitName);
     CreateDirectoryA(full_path, NULL);
     // начальный коммит
-    char *commit_path;
-    charCopy(&commit_path, &full_path);
-    charConcat1(&commit_path, '/');
-    charConcat(&commit_path, &commitName);
-    char *ext = ".csv";
-    charConcat(&commit_path, &ext);
-    puts(commit_path);
+    char commit_path[9999] = "";
+    strcat(commit_path, full_path);
+    strcat(commit_path, "/");
+    strcat(commit_path, commitName);
+    strcat(commit_path, ".csv");
+    FILE *fptr2 = fopen(commit_path, "w");
     // запись изменений (тут получается всё что есть записываем)
-    //FILE *fptr = fopen(commit_path, "w");
+    fclose(fptr2);
 }
 
 void commit()
 {
     FILE *branches = fopen("./VersionControl/BRANCHES.csv", "r");
+    char buff2[9999];
+    fgets(buff2, 9999, (FILE*)branches);
     int c;
     while ((c = getc(branches)) != EOF)
     {
@@ -49,13 +50,13 @@ void commit()
         char *current = strtok(NULL, ",");
         char *last = strtok(NULL, "\n");
         // если в current не пусто, то вытаскиваем путь до current включительно
-        if (strcpy(current, "" != 0))
+        if (strcmp(current, "") != 0)
         {
             char *path = strtok(full_path, current);
+            if (!path) path = "";
             // новая папка new внутри папки path/current
-            puts(path);
-
-            if (strcpy(current, last) == 0)
+            
+            if (strcmp(current, last) == 0)
             {
                 // коммит на той же ветке
                 // обновить full_path на path/current/new в BRANCHES.csv

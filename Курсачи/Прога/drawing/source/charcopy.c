@@ -19,7 +19,7 @@ void charConcat(char ** destination, char ** str)
 {
 	char* tmp;
 	charCopy(&tmp, destination);
-	puts(strlen(*destination) + strlen(*str));
+	printf("%d", strlen(*destination));
 	*destination = (char *)calloc(1, (strlen(*destination) + strlen(*str)) * sizeof(char));
 	memcpy(*destination, tmp, strlen(tmp) * sizeof(char));
 	memcpy(*destination + strlen(tmp) * sizeof(char), *str, (strlen(*str)) * sizeof(char));
