@@ -11,7 +11,6 @@ extern POINT p1;
 
 void initialize()
 {
-    RemoveDirectoryA("./VersionControl");
     CreateDirectoryA("./VersionControl", NULL);
     FILE *fptr = fopen("./VersionControl/BRANCHES.csv", "w");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
