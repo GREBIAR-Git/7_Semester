@@ -14,9 +14,11 @@ void initialize();
 void commit();
 void nextCommit();
 void prevCommit();
-char *rand_string(char *str, size_t size);
-char* rand_string_alloc(size_t size);
 void writeInit(FILE *f);
 void writeDiff(FILE *f);
+
+char *rand_string(char *str, size_t size);
+char* rand_string_alloc(size_t size);
+BOOL startsWith(const char *str, const char *starts_with);
 
 #endif

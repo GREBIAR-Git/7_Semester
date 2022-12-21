@@ -17,7 +17,7 @@ void initialize()
     char vc_branches[9999] = "";
     strcat(vc_branches, vc_path);
     strcat(vc_branches, "/BRANCHES.csv");
-    FILE *fptr = fopen(vc_branches, "w");
+    FILE *fptr = fopen(vc_branches, "wb");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
     char *commitName = rand_string_alloc(commitNameSize);
     fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commitName, commitName, commitName);
@@ -35,7 +35,7 @@ void initialize()
     strcat(commit_path, "/");
     strcat(commit_path, commitName);
     strcat(commit_path, ".csv");
-    FILE *fptr2 = fopen(commit_path, "w");
+    FILE *fptr2 = fopen(commit_path, "wb");
     // содержимое файла с начальным коммитом
     writeInit(fptr2);
     fclose(fptr2);
@@ -46,7 +46,7 @@ void commit()
     char vc_branches[9999] = "";
     strcat(vc_branches, vc_path);
     strcat(vc_branches, "/BRANCHES.csv");
-    FILE *branches = fopen(vc_branches, "r+");
+    FILE *branches = fopen(vc_branches, "r+b");
     char buff2[9999];
     fgets(buff2, 9999, (FILE*)branches);
     int c;
@@ -61,13 +61,16 @@ void commit()
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
-        char *last = strtok(NULL, "\n");
+        char *last = strtok(NULL, "\n\0,");
         if (!current) continue;
         // вытаскиваем путь до current включительно
-        char *path = strtok(full_path, current);
-        // новая папка внутри папки path/current
         char new_path[9999] = "";
-        if (path) strcat(new_path, path);
+        if (!startsWith(full_path, current))
+        {
+            char *path = strtok(full_path, current);
+            strcat(new_path, path);
+        }
+        // новая папка внутри папки path/current
         strcat(new_path, current);
         strcat(new_path, "/");
         char *commitName = rand_string_alloc(commitNameSize);
@@ -83,26 +86,20 @@ void commit()
         strcat(commitFile, "/");
         strcat(commitFile, commitName);
         strcat(commitFile, ".csv");
-        FILE *newF = fopen(commitFile, "w");
+        FILE *newF = fopen(commitFile, "wb");
         writeDiff(newF);
         fclose(newF);
         // обновляем BRANCHES.csv
         if (strcmp(current, last) == 0)
         {
-            fseek(branches, posBefore-posAfter, SEEK_CUR);
+            fseek(branches, posBefore-posAfter-1, SEEK_CUR);
             fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commitName, commitName);
-            // коммит на той же ветке
-            // обновить full_path на path/current/new в BRANCHES.csv
-            // обновить current и last на new в BRANCHES.csv
-
         }
         else
         {
-            // новая ветка
-            // новая строчка в BRANCHES.csv
-            // branch_name сгенерировать в BRANCHES.csv
-            // full_path = path/current/new в BRANCHES.csv
-            // current и last = new в BRANCHES.csv
+            fseek(branches, posBefore-posAfter-1, SEEK_CUR);
+            fprintf(branches, "%s,%s,,%s\n", branch_name, full_path, last);
+            fprintf(branches, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), new_path, commitName, commitName);
         }
 
         break;
@@ -160,4 +157,10 @@ char *rand_string(char *str, size_t size)
         str[size] = '\0';
     }
     return str;
+}
+
+BOOL startsWith(const char *str, const char *starts_with)
+{
+    size_t len = strlen(starts_with);
+    return (strncmp(str, starts_with, len) == 0);
 }

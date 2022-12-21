@@ -15,7 +15,8 @@
 			"modules.h": "c",
 			"windows.h": "c",
 			"menusettings.h": "c",
-			"charcopy.h": "c"
+			"charcopy.h": "c",
+			"string.h": "c"
 		}
 	}
 }
