@@ -18,3 +18,4 @@ Git (Лукьянов)/92PG/log/*.tmp
 *.mk
 *Makefile
 Курсачи/Прога/drawing/VersionControl/
+*.vscode/
