@@ -9,26 +9,34 @@ extern Display display;
 extern BOOL zooming;
 extern POINT p1;
 
+const char* vc_path = "./VersionControl";
+
 void initialize()
 {
-    CreateDirectoryA("./VersionControl", NULL);
-    FILE *fptr = fopen("./VersionControl/BRANCHES.csv", "w");
+    CreateDirectoryA(vc_path, NULL);
+    char vc_branches[9999] = "";
+    strcat(vc_branches, vc_path);
+    strcat(vc_branches, "/BRANCHES.csv");
+    FILE *fptr = fopen(vc_branches, "w");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
     char *commitName = rand_string_alloc(commitNameSize);
     fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commitName, commitName, commitName);
     fclose(fptr);
-    // создать папку с начальным коммитом
-    char full_path[9999] = "./VersionControl/";
+    // папка системы контроля версий
+    char full_path[9999] = "";
+    strcat(full_path, vc_path);
+    strcat(full_path, "/");
+    // папка с начальным коммитом
     strcat(full_path, commitName);
     CreateDirectoryA(full_path, NULL);
-    // начальный коммит
+    // файл с начальным коммитом
     char commit_path[9999] = "";
     strcat(commit_path, full_path);
     strcat(commit_path, "/");
     strcat(commit_path, commitName);
     strcat(commit_path, ".csv");
     FILE *fptr2 = fopen(commit_path, "w");
-    // запись изменений (тут получается всё что есть записываем)
+    // содержимое файла с начальным коммитом
     initialSave(fptr2);
     fclose(fptr2);
 }
@@ -49,34 +57,49 @@ void commit()
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
         char *last = strtok(NULL, "\n");
-        // если в current не пусто, то вытаскиваем путь до current включительно
-        if (strcmp(current, "") != 0)
+        // если current пуст, то для last будет то же самое - далее по коду просто branches.csv по-другому обновится
+        if (strcmp(current, "") == 0) strcat(current, last);
+        // вытаскиваем путь до current включительно
+        char *path = strtok(full_path, current);
+        // новая папка внутри папки path/current
+        char new_path[9999] = "";
+        if (!path) strcat(new_path, path);
+        strcat(new_path, current);
+        strcat(new_path, "/");
+        char *commitName = rand_string_alloc(commitNameSize);
+        strcat(new_path, commitName); // ("path" ? "path" : "") + "current/commitName"
+        char dirPath[9999] = "";
+        // можно вынести в отдельную функцию - получение vc_path со / и который является char asd[9999]
+        strcat(dirPath, vc_path); // можно вынести 1
+        strcat(dirPath, "/"); // можно вынести 2
+        strcat(dirPath, new_path); // "./VersionControl/new_path" // можно вынести 3
+        CreateDirectoryA(dirPath, NULL);
+        char commitFile[9999] = "";
+        strcat(commitFile, dirPath);
+        strcat(commitFile, "/");
+        strcat(commitFile, commitName);
+        strcat(commitFile, ".csv");
+
+        
+        if (strcmp(current, last) == 0)
         {
-            char *path = strtok(full_path, current);
-            if (!path) path = "";
-            // новая папка внутри папки path/current
-            
-            if (strcmp(current, last) == 0)
-            {
-                // коммит на той же ветке
-                // обновить full_path на path/current/new в BRANCHES.csv
-                // обновить current и last на new в BRANCHES.csv
+            // коммит на той же ветке
+            // обновить full_path на path/current/new в BRANCHES.csv
+            // обновить current и last на new в BRANCHES.csv
 
-            }
-            else
-            {
-                // новая ветка
-                // новая строчка в BRANCHES.csv
-                // branch_name сгенерировать в BRANCHES.csv
-                // full_path = path/current/new в BRANCHES.csv
-                // current и last = new в BRANCHES.csv
-            }
-
-            break;
         }
+        else
+        {
+            // новая ветка
+            // новая строчка в BRANCHES.csv
+            // branch_name сгенерировать в BRANCHES.csv
+            // full_path = path/current/new в BRANCHES.csv
+            // current и last = new в BRANCHES.csv
+        }
+
+        break;
     }
-    //char * commitName = rand_string_alloc(commitNameSize);
-    //FILE *fptr = fopen(commitName, "mode");
+    fclose(branches);
 }
 
 void nextCommit()
