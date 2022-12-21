@@ -37,13 +37,16 @@ void initialize()
     strcat(commit_path, ".csv");
     FILE *fptr2 = fopen(commit_path, "w");
     // содержимое файла с начальным коммитом
-    initialSave(fptr2);
+    writeInit(fptr2);
     fclose(fptr2);
 }
 
 void commit()
 {
-    FILE *branches = fopen("./VersionControl/BRANCHES.csv", "r");
+    char vc_branches[9999] = "";
+    strcat(vc_branches, vc_path);
+    strcat(vc_branches, "/BRANCHES.csv");
+    FILE *branches = fopen(vc_branches, "r+");
     char buff2[9999];
     fgets(buff2, 9999, (FILE*)branches);
     int c;
@@ -51,19 +54,20 @@ void commit()
     {
         char buff[9999];
         buff[0]=c;
+        long posBefore = ftell(branches);
         fgets(&buff[1], 9998, (FILE*)branches);
+        long posAfter = ftell(branches);
         // сплит на столбцы
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
         char *last = strtok(NULL, "\n");
-        // если current пуст, то для last будет то же самое - далее по коду просто branches.csv по-другому обновится
-        if (strcmp(current, "") == 0) strcat(current, last);
+        if (!current) continue;
         // вытаскиваем путь до current включительно
         char *path = strtok(full_path, current);
         // новая папка внутри папки path/current
         char new_path[9999] = "";
-        if (!path) strcat(new_path, path);
+        if (path) strcat(new_path, path);
         strcat(new_path, current);
         strcat(new_path, "/");
         char *commitName = rand_string_alloc(commitNameSize);
@@ -79,10 +83,14 @@ void commit()
         strcat(commitFile, "/");
         strcat(commitFile, commitName);
         strcat(commitFile, ".csv");
-
-        
+        FILE *newF = fopen(commitFile, "w");
+        writeDiff(newF);
+        fclose(newF);
+        // обновляем BRANCHES.csv
         if (strcmp(current, last) == 0)
         {
+            fseek(branches, posBefore-posAfter, SEEK_CUR);
+            fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commitName, commitName);
             // коммит на той же ветке
             // обновить full_path на path/current/new в BRANCHES.csv
             // обновить current и last на new в BRANCHES.csv
@@ -112,7 +120,16 @@ void prevCommit()
     
 }
 
-void initialSave(FILE *f)
+void writeInit(FILE *f)
+{
+    fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
+    for (int i = 0; i < elemCount - 1; i++)
+    {
+        fprintf(f, "%d,%lf,%lf,%lf,%lf,%d,%d,%lu\n", i, elem[i].coords.point1.x, elem[i].coords.point1.y, elem[i].coords.point2.x, elem[i].coords.point2.y, elem[i].properties.shape, elem[i].properties.size, elem[i].properties.colour);
+    }
+}
+
+void writeDiff(FILE *f)
 {
     fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
     for (int i = 0; i < elemCount - 1; i++)
