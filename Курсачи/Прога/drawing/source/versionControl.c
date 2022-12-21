@@ -118,9 +118,10 @@ void nextCommit()
         if (!current) continue;
 
         char *currentPos = strstr(full_path, current);
-        char *pathAfter = currentPos + commitNameSize;
+        char nextCurrent[999];
+        memcpy(nextCurrent, currentPos + commitNameSize, commitNameSize-1);
+        nextCurrent[commitNameSize-1] = '\0';
 
-        char *nextCurrent = strtok(pathAfter, "/");
         fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
         fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
         break;
@@ -155,8 +156,8 @@ void prevCommit()
 
         char *currentPos = strstr(full_path, current);
         char nextCurrent[999];
-        memcpy(nextCurrent, currentPos - commitNameSize, commitNameSize);
-        nextCurrent[commitNameSize] = '\0';
+        memcpy(nextCurrent, currentPos - commitNameSize, commitNameSize-1);
+        nextCurrent[commitNameSize-1] = '\0';
 
         fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
         fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
