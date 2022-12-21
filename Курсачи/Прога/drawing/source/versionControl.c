@@ -93,7 +93,11 @@ void commit()
         if (strcmp(current, last) == 0)
         {
             fseek(branches, posBefore-posAfter-1, SEEK_CUR);
-            fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commitName, commitName);
+            puts(branch_name);
+            puts(new_path);
+            puts(commitName);
+            int q = fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commitName, commitName);
+            printf("%d", q);
         }
         else
         {
@@ -109,7 +113,39 @@ void commit()
 
 void nextCommit()
 {
-
+    char vc_branches[9999] = "";
+    strcat(vc_branches, vc_path);
+    strcat(vc_branches, "/BRANCHES.csv");
+    FILE *branches = fopen(vc_branches, "r+b");
+    char buff2[9999];
+    fgets(buff2, 9999, (FILE*)branches);
+    int c;
+    while ((c = getc(branches)) != EOF)
+    {
+        char buff[9999];
+        buff[0]=c;
+        long posBefore = ftell(branches);
+        fgets(&buff[1], 9998, (FILE*)branches);
+        long posAfter = ftell(branches);
+        // сплит на столбцы
+        char *branch_name = strtok(buff, ",");
+        char *full_path = strtok(NULL, ",");
+        char *current = strtok(NULL, ",");
+        char *last = strtok(NULL, "\n\0,");
+        if (!current) continue;
+        char * pathBefore, pathAfter;
+        // вытаскиваем путь до current включительно
+        if (!startsWith(full_path, current))
+        {
+            pathBefore = strtok(full_path, current);
+            pathAfter = strtok(NULL, "\n\0,");
+        }
+        char *nextCurrent = strtok(NULL, "\n\0,/");
+        fseek(branches, posBefore-posAfter-1, SEEK_CUR);
+        fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
+        break;
+    }
+    fclose(branches);
 }
 
 void prevCommit()
@@ -128,11 +164,11 @@ void writeInit(FILE *f)
 
 void writeDiff(FILE *f)
 {
-    fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
+    /*fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
     for (int i = 0; i < elemCount - 1; i++)
     {
         fprintf(f, "%d,%lf,%lf,%lf,%lf,%d,%d,%lu\n", i, elem[i].coords.point1.x, elem[i].coords.point1.y, elem[i].coords.point2.x, elem[i].coords.point2.y, elem[i].properties.shape, elem[i].properties.size, elem[i].properties.colour);
-    }
+    }*/
 }
 
 char* rand_string_alloc(size_t size)
@@ -163,4 +199,39 @@ BOOL startsWith(const char *str, const char *starts_with)
 {
     size_t len = strlen(starts_with);
     return (strncmp(str, starts_with, len) == 0);
+}
+
+char* escape(char* buffer)
+{
+    int i,j;
+    int l = strlen(buffer) + 1;
+    char esc_char[]= { '\a','\b','\f','\n','\r','\t','\v','\\'};
+    char essc_str[]= {  'a', 'b', 'f', 'n', 'r', 't', 'v','\\'};
+  char* dest  =  (char*)calloc( l*2,sizeof(char));
+    char* ptr=dest;
+    for(i=0;i<l;i++){
+        for(j=0; j< 8 ;j++){
+            if( buffer[i]==esc_char[j] ){
+              *ptr++ = '\\';
+              *ptr++ = essc_str[j];
+                 break;
+            }
+        }
+        if(j == 8 )
+      *ptr++ = buffer[i];
+    }
+  *ptr='\0';
+    return dest;
+}
+
+void str_concat(char *result, int count, ...)
+{
+    va_list args;
+
+    va_start(args, count);
+    for(int i = 0; i < count; i++)
+    {
+        strcat(result, va_arg(args, char*));
+    }
+    va_end(args);
 }
