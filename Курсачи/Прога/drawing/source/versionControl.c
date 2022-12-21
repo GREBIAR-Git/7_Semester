@@ -60,11 +60,9 @@ void commit()
 
         if (!current) continue;
         char new_path[9999] = "";
-        if (!startsWith(full_path, current))
-        {
-            char *path = strtok(full_path, current);
-            str_concat(new_path, 1, path);
-        }
+        char *currentPos = strstr(full_path, current);
+        memcpy(new_path, full_path, currentPos - full_path);
+        new_path[currentPos - full_path] = '\0';
         char *commit_name = rand_string_alloc(commitNameSize);
         str_concat(new_path, 3, current, "/", commit_name);
 
@@ -118,14 +116,11 @@ void nextCommit()
         char *last = strtok(NULL, "\n\0,");
 
         if (!current) continue;
-        char * pathBefore, pathAfter;
-        // вытаскиваем путь до current включительно
-        if (!startsWith(full_path, current))
-        {
-            pathBefore = strtok(full_path, current);
-            pathAfter = strtok(NULL, "\n\0,");
-        }
-        char *nextCurrent = strtok(NULL, "\n\0,/");
+
+        char *currentPos = strstr(full_path, current);
+        char *pathAfter = currentPos + commitNameSize;
+
+        char *nextCurrent = strtok(pathAfter, "/");
         fseek(branches, posBefore-posAfter-1, SEEK_CUR);
         fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
         break;
@@ -217,6 +212,31 @@ void str_concat(char *result, int count, ...)
     for(int i = 0; i < count; i++)
     {
         strcat(result, va_arg(args, char*));
+    }
+    va_end(args);
+}
+
+void str_split(char* str, char* delimiter, int delimiter_len, int count, ...)
+{
+    va_list args;
+
+    va_start(args, count);
+    for(int i = 0; i < count; i++)
+    {
+        char* delimiterPos = strstr(str, delimiter);
+        if (delimiterPos != NULL)
+        {
+            char *arg = va_arg(args, char*);
+            memcpy(arg, str, delimiterPos - str);
+            arg[delimiterPos - str] = '\0';
+            str = delimiterPos + delimiter_len;
+        }
+        else
+        {
+            char *arg = va_arg(args, char*);
+            memcpy(arg, str, delimiterPos - str);
+
+        }
     }
     va_end(args);
 }
