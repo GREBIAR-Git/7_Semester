@@ -195,7 +195,7 @@ char* rand_string_alloc(size_t size)
 
 char *rand_string(char *str, size_t size)
 {
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const char charset[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     if (size)
     {
         --size;
