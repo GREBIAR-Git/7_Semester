@@ -8,8 +8,8 @@
 #include "g_var.h"
 #include "charcopy.h"
 
-#define commitNameSize 40
-#define branchNameSize 20
+#define commitNameSize 6
+#define branchNameSize 4
 
 void initialize();
 void commit();

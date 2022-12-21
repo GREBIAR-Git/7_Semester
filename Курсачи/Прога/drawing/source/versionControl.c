@@ -56,7 +56,7 @@ void commit()
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
-        char *last = strtok(NULL, "\n\0,");
+        char *last = strtok(NULL, "\n");
 
         if (!current) continue;
         char new_path[9999] = "";
@@ -78,12 +78,12 @@ void commit()
 
         if (strcmp(current, last) == 0)
         {
-            fseek(branches, posBefore-posAfter-1, SEEK_CUR);
+            fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
             fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commit_name, commit_name);
         }
         else
         {
-            fseek(branches, posBefore-posAfter-1, SEEK_CUR);
+            fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
             fprintf(branches, "%s,%s,,%s\n", branch_name, full_path, last);
             fprintf(branches, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), new_path, commit_name, commit_name);
         }
@@ -113,7 +113,7 @@ void nextCommit()
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
-        char *last = strtok(NULL, "\n\0,");
+        char *last = strtok(NULL, "\n");
 
         if (!current) continue;
 
@@ -121,7 +121,7 @@ void nextCommit()
         char *pathAfter = currentPos + commitNameSize;
 
         char *nextCurrent = strtok(pathAfter, "/");
-        fseek(branches, posBefore-posAfter-1, SEEK_CUR);
+        fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
         fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
         break;
     }
@@ -130,7 +130,39 @@ void nextCommit()
 
 void prevCommit()
 {
+    char branches_csv[9999] = "";
+    str_concat(branches_csv, 2, vc_path, "/BRANCHES.csv");
+    FILE *branches = fopen(branches_csv, "r+b");
 
+    char buff_skip[9999];
+    fgets(buff_skip, 9999, (FILE*)branches);
+
+    int c;
+    while ((c = getc(branches)) != EOF)
+    {
+        char buff[9999];
+        buff[0]=c;
+        long posBefore = ftell(branches);
+        fgets(&buff[1], 9998, (FILE*)branches);
+        long posAfter = ftell(branches);
+
+        char *branch_name = strtok(buff, ",");
+        char *full_path = strtok(NULL, ",");
+        char *current = strtok(NULL, ",");
+        char *last = strtok(NULL, "\n");
+
+        if (!current) continue;
+
+        char *currentPos = strstr(full_path, current);
+        char nextCurrent[999];
+        memcpy(nextCurrent, currentPos - commitNameSize, commitNameSize);
+        nextCurrent[commitNameSize] = '\0';
+
+        fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
+        fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
+        break;
+    }
+    fclose(branches);
 }
 
 void writeInit(FILE *f)
