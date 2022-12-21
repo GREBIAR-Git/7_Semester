@@ -22,17 +22,17 @@ typedef struct COORDINATESS
 	PointD point2;
 }Coords;
 
-typedef struct TYPEELEMENT
+typedef struct ELEMENTPROPERTIES
 {
 	int shape;
 	COLORREF colour;
 	int size;
-}TypeElement;
+}ElementProperties;
 
 typedef struct ELEMENT
 {
 	Coords coords;
-	TypeElement typeElement;
+	ElementProperties properties;
 }Element;
 
 #endif

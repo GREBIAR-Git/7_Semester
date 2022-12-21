@@ -1,7 +1,7 @@
 #include "ButtonEvents.h"
 
 extern BOOL drawing;
-extern TypeElement currentElement;
+extern ElementProperties currentElement;
 extern Element elem[elemBufferSize];
 extern int currentIndex;
 extern int elemCount;
@@ -80,8 +80,19 @@ ButtonDown(HWND hwnd)
     display.center.y-=step;
     UpdateWin(hwnd);
 }
-ButtonVersionControl(HWND hwnd)
+ButtonInitVC(HWND hwnd)
 {
-    //initialize();
+    initialize();
+}
+ButtonVCCommit(HWND hwnd)
+{
     commit();
+}
+ButtonVCNextCommit(HWND hwnd)
+{
+    nextCommit();
+}
+ButtonVCPrevCommit(HWND hwnd)
+{
+    prevCommit();
 }

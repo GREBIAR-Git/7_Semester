@@ -2,6 +2,7 @@
 #define RENAMEME_H
 
 #include <windows.h>
+#include <math.h>
 #include "Elements.h"
 #include "g_var.h"
 #include "MenuTools.h"

@@ -1,7 +1,7 @@
 #include "versionControl.h"
 
 extern BOOL drawing;
-extern TypeElement currentElement;
+extern ElementProperties currentElement;
 extern Element elem[elemBufferSize];
 extern int currentIndex;
 extern int elemCount;
@@ -29,6 +29,7 @@ void initialize()
     strcat(commit_path, ".csv");
     FILE *fptr2 = fopen(commit_path, "w");
     // запись изменений (тут получается всё что есть записываем)
+    initialSave(fptr2);
     fclose(fptr2);
 }
 
@@ -53,7 +54,7 @@ void commit()
         {
             char *path = strtok(full_path, current);
             if (!path) path = "";
-            // новая папка new внутри папки path/current
+            // новая папка внутри папки path/current
             
             if (strcmp(current, last) == 0)
             {
@@ -76,6 +77,25 @@ void commit()
     }
     //char * commitName = rand_string_alloc(commitNameSize);
     //FILE *fptr = fopen(commitName, "mode");
+}
+
+void nextCommit()
+{
+
+}
+
+void prevCommit()
+{
+    
+}
+
+void initialSave(FILE *f)
+{
+    fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
+    for (int i = 0; i < elemCount - 1; i++)
+    {
+        fprintf(f, "%d,%lf,%lf,%lf,%lf,%d,%d,%lu\n", i, elem[i].coords.point1.x, elem[i].coords.point1.y, elem[i].coords.point2.x, elem[i].coords.point2.y, elem[i].properties.shape, elem[i].properties.size, elem[i].properties.colour);
+    }
 }
 
 char* rand_string_alloc(size_t size)

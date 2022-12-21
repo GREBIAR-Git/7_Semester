@@ -1,7 +1,7 @@
 #include "renameMe.h"
 
 extern BOOL drawing;
-extern TypeElement currentElement;
+extern ElementProperties currentElement;
 extern Element elem[elemBufferSize];
 extern int currentIndex;
 extern int elemCount;
@@ -115,9 +115,9 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 		GetClientRect(hwnd,&window);
 		PointD firstPoint = ZoomReverce(LOWORD(lParam), HIWORD(lParam), window);
 		elem[currentIndex].coords.point1 = firstPoint;
-		elem[currentIndex].typeElement.shape = currentElement.shape;
-		elem[currentIndex].typeElement.colour = currentElement.colour;
-		elem[currentIndex].typeElement.size = currentElement.size;
+		elem[currentIndex].properties.shape = currentElement.shape;
+		elem[currentIndex].properties.colour = currentElement.colour;
+		elem[currentIndex].properties.size = currentElement.size;
 		drawing = TRUE;
 		break;
 	}
@@ -180,17 +180,17 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 			double y2 = elem[i].coords.point2.y;
 			PointD f1 = Zoom(x1,y1,window);
 			PointD f2 = Zoom(x2,y2,window);
-			if (elem[i].typeElement.shape == shapeLine)
+			if (elem[i].properties.shape == shapeLine)
 			{
-				HPEN hPen = CreatePen(PS_SOLID, elem[i].typeElement.size, elem[i].typeElement.colour);
+				HPEN hPen = CreatePen(PS_SOLID, elem[i].properties.size, elem[i].properties.colour);
 				SelectObject(memDc, hPen);
 				Line(memDc, f1.x, f1.y, f2.x, f2.y);
 				DeleteObject(hPen);
 			}
-			else if (elem[i].typeElement.shape == shapeRectangle)
+			else if (elem[i].properties.shape == shapeRectangle)
 			{
-				HPEN hPen = CreatePen(PS_DASH, elem[i].typeElement.size, elem[i].typeElement.colour);
-				HBRUSH hBrush = CreateHatchBrush(HS_BDIAGONAL, elem[i].typeElement.colour);
+				HPEN hPen = CreatePen(PS_DASH, elem[i].properties.size, elem[i].properties.colour);
+				HBRUSH hBrush = CreateHatchBrush(HS_BDIAGONAL, elem[i].properties.colour);
 				SelectObject(memDc, hPen);
 				SelectObject(memDc, hBrush);
 
@@ -199,10 +199,10 @@ LRESULT CALLBACK FrameWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				DeleteObject(hBrush);
 				DeleteObject(hPen);
 			}
-			else if (elem[i].typeElement.shape == shapeEllipse)
+			else if (elem[i].properties.shape == shapeEllipse)
 			{
-				HPEN hPen = CreatePen(PS_SOLID, elem[i].typeElement.size, elem[i].typeElement.colour);
-				HBRUSH hBrush = CreateSolidBrush(elem[i].typeElement.colour);
+				HPEN hPen = CreatePen(PS_SOLID, elem[i].properties.size, elem[i].properties.colour);
+				HBRUSH hBrush = CreateSolidBrush(elem[i].properties.colour);
 				SelectObject(memDc, hBrush);
 				SelectObject(memDc, hPen);
 
@@ -401,7 +401,25 @@ int MenuButtonPressed(HWND hwnd, BOOL skip_processing)
 	else if (CursorInsideArea(menu.buttons[15].area, cursorCoords))
 	{
 		if (skip_processing) return 2;
-		ButtonVersionControl(hwnd);
+		ButtonInitVC(hwnd);
+		return 1;
+	}
+	else if (CursorInsideArea(menu.buttons[16].area, cursorCoords))
+	{
+		if (skip_processing) return 2;
+		ButtonVCCommit(hwnd);
+		return 1;
+	}
+	else if (CursorInsideArea(menu.buttons[17].area, cursorCoords))
+	{
+		if (skip_processing) return 2;
+		ButtonVCNextCommit(hwnd);
+		return 1;
+	}
+	else if (CursorInsideArea(menu.buttons[18].area, cursorCoords))
+	{
+		if (skip_processing) return 2;
+		ButtonVCPrevCommit(hwnd);
 		return 1;
 	}
 	else

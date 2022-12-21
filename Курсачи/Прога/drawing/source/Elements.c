@@ -1,7 +1,7 @@
 #include "Elements.h"
 
 extern BOOL drawing;
-extern TypeElement currentElement;
+extern ElementProperties currentElement;
 extern Element elem[elemBufferSize];
 extern int currentIndex;
 extern int elemCount;

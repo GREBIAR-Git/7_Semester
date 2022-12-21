@@ -21,6 +21,9 @@ ButtonLeft(HWND hwnd);
 ButtonRight(HWND hwnd);
 ButtonUp(HWND hwnd);
 ButtonDown(HWND hwnd);
-ButtonVersionControl(HWND hwnd);
+ButtonInitVC(HWND hwnd);
+ButtonVCCommit(HWND hwnd);
+ButtonVCNextCommit(HWND hwnd);
+ButtonVCPrevCommit(HWND hwnd);
 
 #endif

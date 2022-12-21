@@ -12,7 +12,10 @@
 
 void initialize();
 void commit();
+void nextCommit();
+void prevCommit();
 char *rand_string(char *str, size_t size);
 char* rand_string_alloc(size_t size);
+void initialSave(FILE *f);
 
 #endif

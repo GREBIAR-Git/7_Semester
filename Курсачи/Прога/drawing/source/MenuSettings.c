@@ -38,5 +38,8 @@ int DrawUI(HDC hdc, RECT window)
     DrawMenuButton(hdc, "Right");
     DrawMenuButton(hdc, "Up");
     DrawMenuButton(hdc, "Down");
-    DrawMenuButton(hdc, "Version Control");
+    DrawMenuButton(hdc, "VC Init");
+    DrawMenuButton(hdc, "VC Commit");
+    DrawMenuButton(hdc, "VC Next commit");
+    DrawMenuButton(hdc, "VC Prev commit");
 }

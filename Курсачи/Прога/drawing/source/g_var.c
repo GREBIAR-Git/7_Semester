@@ -1,7 +1,7 @@
 #include "g_var.h"
 
 BOOL drawing;
-TypeElement currentElement;
+ElementProperties currentElement;
 Element elem[elemBufferSize];
 int currentIndex;
 int elemCount;
