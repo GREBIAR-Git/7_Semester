@@ -14,28 +14,22 @@ const char* vc_path = "./VersionControl";
 void initialize()
 {
     CreateDirectoryA(vc_path, NULL);
-    char vc_branches[9999] = "";
-    strcat(vc_branches, vc_path);
-    strcat(vc_branches, "/BRANCHES.csv");
-    FILE *fptr = fopen(vc_branches, "wb");
+
+    char branches_csv[9999] = "";
+    str_concat(branches_csv, 2, vc_path, "/BRANCHES.csv");
+    FILE *fptr = fopen(branches_csv, "wb");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
-    char *commitName = rand_string_alloc(commitNameSize);
-    fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commitName, commitName, commitName);
+    char *commit_name = rand_string_alloc(commitNameSize);
+    fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commit_name, commit_name, commit_name);
     fclose(fptr);
-    // папка системы контроля версий
+
     char full_path[9999] = "";
-    strcat(full_path, vc_path);
-    strcat(full_path, "/");
-    // папка с начальным коммитом
-    strcat(full_path, commitName);
+    str_concat(full_path, 3, vc_path, "/", commit_name);
     CreateDirectoryA(full_path, NULL);
-    // файл с начальным коммитом
-    char commit_path[9999] = "";
-    strcat(commit_path, full_path);
-    strcat(commit_path, "/");
-    strcat(commit_path, commitName);
-    strcat(commit_path, ".csv");
-    FILE *fptr2 = fopen(commit_path, "wb");
+
+    char commit_csv[9999] = "";
+    str_concat(commit_csv, 4, full_path, "/", commit_name, ".csv");
+    FILE *fptr2 = fopen(commit_csv, "wb");
     // содержимое файла с начальным коммитом
     writeInit(fptr2);
     fclose(fptr2);
@@ -43,12 +37,13 @@ void initialize()
 
 void commit()
 {
-    char vc_branches[9999] = "";
-    strcat(vc_branches, vc_path);
-    strcat(vc_branches, "/BRANCHES.csv");
-    FILE *branches = fopen(vc_branches, "r+b");
-    char buff2[9999];
-    fgets(buff2, 9999, (FILE*)branches);
+    char branches_csv[9999] = "";
+    str_concat(branches_csv, 2, vc_path, "/BRANCHES.csv");
+    FILE *branches = fopen(branches_csv, "r+b");
+
+    char buff_skip[9999];
+    fgets(buff_skip, 9999, (FILE*)branches);
+
     int c;
     while ((c = getc(branches)) != EOF)
     {
@@ -57,55 +52,43 @@ void commit()
         long posBefore = ftell(branches);
         fgets(&buff[1], 9998, (FILE*)branches);
         long posAfter = ftell(branches);
-        // сплит на столбцы
+
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
         char *last = strtok(NULL, "\n\0,");
+
         if (!current) continue;
-        // вытаскиваем путь до current включительно
         char new_path[9999] = "";
         if (!startsWith(full_path, current))
         {
             char *path = strtok(full_path, current);
-            strcat(new_path, path);
+            str_concat(new_path, 1, path);
         }
-        // новая папка внутри папки path/current
-        strcat(new_path, current);
-        strcat(new_path, "/");
-        char *commitName = rand_string_alloc(commitNameSize);
-        strcat(new_path, commitName); // ("path" ? "path" : "") + "current/commitName"
-        char dirPath[9999] = "";
-        // можно вынести в отдельную функцию - получение vc_path со / и который является char asd[9999]
-        strcat(dirPath, vc_path); // можно вынести 1
-        strcat(dirPath, "/"); // можно вынести 2
-        strcat(dirPath, new_path); // "./VersionControl/new_path" // можно вынести 3
-        CreateDirectoryA(dirPath, NULL);
+        char *commit_name = rand_string_alloc(commitNameSize);
+        str_concat(new_path, 3, current, "/", commit_name);
+
+        char dir_path[9999] = "";
+        str_concat(dir_path, 3, vc_path, "/", new_path);
+        CreateDirectoryA(dir_path, NULL);
+
         char commitFile[9999] = "";
-        strcat(commitFile, dirPath);
-        strcat(commitFile, "/");
-        strcat(commitFile, commitName);
-        strcat(commitFile, ".csv");
+        str_concat(commitFile, 4, dir_path, "/", commit_name, ".csv");
         FILE *newF = fopen(commitFile, "wb");
         writeDiff(newF);
         fclose(newF);
-        // обновляем BRANCHES.csv
+
         if (strcmp(current, last) == 0)
         {
             fseek(branches, posBefore-posAfter-1, SEEK_CUR);
-            puts(branch_name);
-            puts(new_path);
-            puts(commitName);
-            int q = fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commitName, commitName);
-            printf("%d", q);
+            fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commit_name, commit_name);
         }
         else
         {
             fseek(branches, posBefore-posAfter-1, SEEK_CUR);
             fprintf(branches, "%s,%s,,%s\n", branch_name, full_path, last);
-            fprintf(branches, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), new_path, commitName, commitName);
+            fprintf(branches, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), new_path, commit_name, commit_name);
         }
-
         break;
     }
     fclose(branches);
@@ -113,12 +96,13 @@ void commit()
 
 void nextCommit()
 {
-    char vc_branches[9999] = "";
-    strcat(vc_branches, vc_path);
-    strcat(vc_branches, "/BRANCHES.csv");
-    FILE *branches = fopen(vc_branches, "r+b");
-    char buff2[9999];
-    fgets(buff2, 9999, (FILE*)branches);
+    char branches_csv[9999] = "";
+    str_concat(branches_csv, 2, vc_path, "/BRANCHES.csv");
+    FILE *branches = fopen(branches_csv, "r+b");
+
+    char buff_skip[9999];
+    fgets(buff_skip, 9999, (FILE*)branches);
+
     int c;
     while ((c = getc(branches)) != EOF)
     {
@@ -127,11 +111,12 @@ void nextCommit()
         long posBefore = ftell(branches);
         fgets(&buff[1], 9998, (FILE*)branches);
         long posAfter = ftell(branches);
-        // сплит на столбцы
+
         char *branch_name = strtok(buff, ",");
         char *full_path = strtok(NULL, ",");
         char *current = strtok(NULL, ",");
         char *last = strtok(NULL, "\n\0,");
+
         if (!current) continue;
         char * pathBefore, pathAfter;
         // вытаскиваем путь до current включительно
@@ -150,7 +135,7 @@ void nextCommit()
 
 void prevCommit()
 {
-    
+
 }
 
 void writeInit(FILE *f)
