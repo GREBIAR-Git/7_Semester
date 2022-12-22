@@ -61,10 +61,8 @@ void commit()
         if (!current) continue;
 
         char new_path[9999] = "";
-        printf("[%s]=-=-=-=[%s]\n", escape(full_path), escape(current));
         char *currentPos = strstr(full_path, current);
         if (currentPos) printf("-=-=-=");
-        printf("zxc:%d", currentPos - full_path);
         memcpy(new_path, full_path, currentPos - full_path);
         new_path[currentPos - full_path] = '\0';
         char *commit_name = rand_string_alloc(commitNameSize);
