@@ -20,7 +20,7 @@ void initialize()
     FILE *fptr = fopen(branches_csv, "wb");
     fprintf(fptr, "%s,%s,%s,%s\n", "branch_name", "full_path", "current", "last");
     char *commit_name = rand_string_alloc(commitNameSize);
-    fprintf(fptr, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), commit_name, commit_name, commit_name);
+    fprintf(fptr, "%s,%s,%s,%s\n", escape(rand_string_alloc(branchNameSize)), escape(commit_name), escape(commit_name), escape(commit_name));
     fclose(fptr);
 
     char full_path[9999] = "";
@@ -61,8 +61,8 @@ void commit()
         if (!current) continue;
 
         char new_path[9999] = "";
+        printf("|[%s]\n[%s]|", escape(full_path), escape(current));
         char *currentPos = strstr(full_path, current);
-        if (currentPos) printf("-=-=-=");
         memcpy(new_path, full_path, currentPos - full_path);
         new_path[currentPos - full_path] = '\0';
         char *commit_name = rand_string_alloc(commitNameSize);
@@ -81,13 +81,14 @@ void commit()
         if (strcmp(current, last) == 0)
         {
             fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
-            fprintf(branches, "%s,%s,%s,%s\n", branch_name, new_path, commit_name, commit_name);
+            fprintf(branches, "%s,%s,%s,%s\n", escape(branch_name), escape(new_path), escape(commit_name), escape(commit_name));
         }
         else
         {
             fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
-            fprintf(branches, "%s,%s,,%s\n", branch_name, full_path, last);
-            fprintf(branches, "%s,%s,%s,%s\n", rand_string_alloc(branchNameSize), new_path, commit_name, commit_name);
+            fprintf(branches, "%s,%s,,%s\n", escape(branch_name), escape(full_path), escape(last));
+            fseek(branches, 0, SEEK_END);
+            fprintf(branches, "%s,%s,%s,%s\n", escape(rand_string_alloc(branchNameSize)), escape(new_path), escape(commit_name), escape(commit_name));
         }
         break;
     }
@@ -125,7 +126,7 @@ void nextCommit()
         nextCurrent[commitNameSize-1] = '\0';
 
         fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
-        fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
+        fprintf(branches, "%s,%s,%s,%s\n", escape(branch_name), escape(full_path), escape(nextCurrent), escape(last));
         break;
     }
     fclose(branches);
@@ -162,7 +163,7 @@ void prevCommit()
         nextCurrent[commitNameSize-1] = '\0';
 
         fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
-        fprintf(branches, "%s,%s,%s,%s\n", branch_name, full_path, nextCurrent, last);
+        fprintf(branches, "%s,%s,%s,%s\n", escape(branch_name), escape(full_path), escape(nextCurrent), escape(last));
         break;
     }
     fclose(branches);
