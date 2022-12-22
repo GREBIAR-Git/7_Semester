@@ -156,6 +156,7 @@ void prevCommit()
         char *last = strtok(NULL, "\n");
 
         if (!current) continue;
+        if (startsWith(full_path, current)) break;
 
         char *currentPos = strstr(full_path, current);
         char nextCurrent[999];
