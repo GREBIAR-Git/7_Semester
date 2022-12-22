@@ -33,6 +33,9 @@ void initialize()
     // содержимое файла с начальным коммитом
     writeInit(fptr2);
     fclose(fptr2);
+    fptr2 = fopen(commit_csv, "rb");
+    readChanges(fptr2);
+    fclose(fptr2);
 }
 
 void commit()
@@ -179,13 +182,57 @@ void writeInit(FILE *f)
     }
 }
 
+void calculateDiff(Element * result)
+{
+    // собираю новый elem на основе всех коммитов на ветке до current включительно
+    Element last_saved_elem[elemBufferSize];
+    
+
+    // потом сравниваю новый собранный elem с основным - получаю разницу
+
+    // собираю результирующий elem - result
+}
+
+void readChanges(FILE *f)
+{
+    char buff_skip[9999];
+    fgets(buff_skip, 9999, (FILE*)f);
+
+    int c;
+    while ((c = getc(f)) != EOF)
+    {
+        char buff[9999];
+        buff[0]=c;
+        long posBefore = ftell(f);
+        fgets(&buff[1], 9998, (FILE*)f);
+        long posAfter = ftell(f);
+
+        int id, shape, size;
+        double x1, y1, x2, y2;
+        COLORREF colour;
+
+        sscanf(strtok(buff, ","), "%d", &id);
+        sscanf(strtok(NULL, ","), "%lf", &x1);
+        sscanf(strtok(NULL, ","), "%lf", &y1);
+        sscanf(strtok(NULL, ","), "%lf", &x2);
+        sscanf(strtok(NULL, ","), "%lf", &y2);
+        sscanf(strtok(NULL, ","), "%d", &shape);
+        sscanf(strtok(NULL, ","), "%d", &size);
+        sscanf(strtok(NULL, "\n"), "%lu", &colour);
+
+        printf("test:\n");
+        printf("%d,%lf,%lf,%lf,%lf,%d,%d,%lu\n", id, x1, y1, x2, y2, shape, size, colour);
+    }
+}
+
 void writeDiff(FILE *f)
 {
-    /*fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
+    // 
+    fprintf(f, "%s,%s,%s,%s,%s,%s,%s,%s\n", "#","x1", "y1", "x2", "y2", "shape", "size", "colour");
     for (int i = 0; i < elemCount - 1; i++)
     {
         fprintf(f, "%d,%lf,%lf,%lf,%lf,%d,%d,%lu\n", i, elem[i].coords.point1.x, elem[i].coords.point1.y, elem[i].coords.point2.x, elem[i].coords.point2.y, elem[i].properties.shape, elem[i].properties.size, elem[i].properties.colour);
-    }*/
+    }
 }
 
 char* rand_string_alloc(size_t size)
@@ -251,6 +298,17 @@ void str_concat(char *result, int count, ...)
         strcat(result, va_arg(args, char*));
     }
     va_end(args);
+}
+
+double toDouble(const char* s, int start, int stop)
+{
+    unsigned long long int m = 1;
+    double ret = 0;
+    for (int i = stop; i >= start; i--) {
+        ret += (s[i] - '0') * m;
+        m *= 10;
+    }
+    return ret;
 }
 
 void str_split(char* str, char* delimiter, int delimiter_len, int count, ...)

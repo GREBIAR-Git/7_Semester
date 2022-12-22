@@ -23,5 +23,7 @@ char* rand_string_alloc(size_t size);
 BOOL startsWith(const char *str, const char *starts_with);
 char* escape(char* buffer);
 void str_concat(char *result, int count, ...);
+double toDouble(const char* s, int start, int stop);
+void calculateDiff(Element * result);
 
 #endif
