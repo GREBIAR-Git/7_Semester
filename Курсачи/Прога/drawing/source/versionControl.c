@@ -186,7 +186,50 @@ void calculateDiff(Element * result)
 {
     // собираю новый elem на основе всех коммитов на ветке до current включительно
     Element last_saved_elem[elemBufferSize];
+
+    //читаю full_path, чтобы потом считывать нужные файлы по порядку
+    char branches_csv[9999] = "";
+    str_concat(branches_csv, 2, vc_path, "/BRANCHES.csv");
+    FILE *branches = fopen(branches_csv, "rb");
     
+    char buff_skip[9999];
+    fgets(buff_skip, 9999, (FILE*)branches);
+
+    int c;
+    while ((c = getc(branches)) != EOF)
+    {
+        char buff[9999];
+        buff[0]=c;
+        long posBefore = ftell(branches);
+        fgets(&buff[1], 9998, (FILE*)branches);
+        long posAfter = ftell(branches);
+
+        char *branch_name = strtok(buff, ",");
+        char *full_path = strtok(NULL, ",");
+        char *current = strtok(NULL, ",");
+        char *last = strtok(NULL, "\n");
+
+        if (!current) continue;
+
+        char *currentPos = full_path;
+        while(1)
+        {
+            char commitPath = "";
+            //str_concat(commitPath, vc_path, "/", )
+            
+
+            //if (startsWith(currentPos, current)) break;
+        }
+        /*char *currentPos = strstr(full_path, current);
+        char nextCurrent[999];
+        memcpy(nextCurrent, currentPos + commitNameSize, commitNameSize-1);
+        nextCurrent[commitNameSize-1] = '\0';
+
+        fseek(branches, posBefore-posAfter - 1, SEEK_CUR);
+        fprintf(branches, "%s,%s,%s,%s\n", escape(branch_name), escape(full_path), escape(nextCurrent), escape(last));*/
+        break;
+    }
+    fclose(branches);
 
     // потом сравниваю новый собранный elem с основным - получаю разницу
 
